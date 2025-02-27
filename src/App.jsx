@@ -1,183 +1,162 @@
-import React, { useState } from 'react';
-import { ChevronDown, ChevronUp, RefreshCw, User, Clock, CheckCircle, AlertTriangle, XCircle, ArrowUpLeft as ArrowUturnLeft, Filter, Calendar, Download, Search, MoreHorizontal } from 'lucide-react';
-
-// Mock data structure
-const funnelData = [
-  {
-    id: '1',
-    name: 'Sourcing',
-    duration: '2h 30m',
-    date: '17/04/2024',
-    time: '03:00 PM',
-    status: 'completed',
-    tasks: [
-      { id: '101', applicationId: 'APP-001', name: 'Send Consent OTP', status: 'completed', createdAt: '17/04/2024 03:00 PM', updatedAt: '17/04/2024 03:05 PM' },
-      { id: '102', applicationId: 'APP-001', name: 'Create Lead', status: 'completed', createdAt: '17/04/2024 03:05 PM', updatedAt: '17/04/2024 03:10 PM' },
-      { id: '103', applicationId: 'APP-001', name: 'Basic Details', status: 'completed', createdAt: '17/04/2024 03:10 PM', updatedAt: '17/04/2024 03:15 PM' },
-      { id: '104', applicationId: 'APP-001', name: 'DOB Check', status: 'completed', createdAt: '17/04/2024 03:15 PM', updatedAt: '17/04/2024 03:20 PM' },
-      { id: '105', applicationId: 'APP-001', name: 'COL Check', status: 'completed', createdAt: '17/04/2024 03:20 PM', updatedAt: '17/04/2024 03:25 PM' },
-      { id: '106', applicationId: 'APP-001', name: 'Pan Validation', status: 'completed', createdAt: '17/04/2024 03:25 PM', updatedAt: '17/04/2024 03:30 PM', lastEditedBy: 'Mohit Bansal (Sourcing Agent)' },
-      { id: '107', applicationId: 'APP-001', name: 'Bajaj Offer Initiate', status: 'completed', createdAt: '17/04/2024 03:30 PM', updatedAt: '17/04/2024 03:35 PM' },
-      { id: '108', applicationId: 'APP-001', name: 'Pan Photo Upload', status: 'completed', createdAt: '17/04/2024 03:35 PM', updatedAt: '17/04/2024 03:40 PM' },
-      { id: '109', applicationId: 'APP-001', name: 'Fraud Check', status: 'completed', createdAt: '17/04/2024 03:40 PM', updatedAt: '17/04/2024 03:45 PM' },
-      { id: '110', applicationId: 'APP-001', name: 'Current Address', status: 'completed', createdAt: '17/04/2024 03:45 PM', updatedAt: '17/04/2024 03:50 PM' },
-      { id: '111', applicationId: 'APP-001', name: 'Contact Details', status: 'completed', createdAt: '17/04/2024 03:50 PM', updatedAt: '17/04/2024 03:55 PM' },
-      { id: '112', applicationId: 'APP-001', name: 'Personal Details', status: 'completed', createdAt: '17/04/2024 03:55 PM', updatedAt: '17/04/2024 04:00 PM' },
-      { id: '113', applicationId: 'APP-001', name: 'Address Details', status: 'completed', createdAt: '17/04/2024 04:00 PM', updatedAt: '17/04/2024 04:05 PM' },
-      { id: '114', applicationId: 'APP-001', name: 'Employment Details', status: 'completed', createdAt: '17/04/2024 04:05 PM', updatedAt: '17/04/2024 04:10 PM' },
-      { id: '115', applicationId: 'APP-001', name: 'Asset Attach', status: 'completed', createdAt: '17/04/2024 04:10 PM', updatedAt: '17/04/2024 04:15 PM' },
-    ]
-  },
-  {
-    id: '2',
-    name: 'Credit',
-    duration: '1h 45m',
-    date: '17/04/2024',
-    time: '04:15 PM',
-    status: 'completed',
-    tasks: [
-      { id: '201', applicationId: 'APP-001', name: 'CIBIL Pull', status: 'completed', createdAt: '17/04/2024 04:15 PM', updatedAt: '17/04/2024 04:25 PM' },
-      { id: '202', applicationId: 'APP-001', name: 'Credit workflow', status: 'completed', createdAt: '17/04/2024 04:25 PM', updatedAt: '17/04/2024 04:35 PM' },
-      { id: '203', applicationId: 'APP-001', name: 'DC Approve', status: 'completed', createdAt: '17/04/2024 04:35 PM', updatedAt: '17/04/2024 04:45 PM' },
-    ]
-  },
-  {
-    id: '3',
-    name: 'Sourcing (Revisit)',
-    duration: '1h 15m',
-    date: '17/04/2024',
-    time: '04:45 PM',
-    status: 'completed',
-    tasks: [
-      { 
-        id: '301', 
-        applicationId: 'APP-001', 
-        name: 'Customer Banking', 
-        status: 'warning', 
-        createdAt: '17/04/2024 04:45 PM', 
-        updatedAt: '17/04/2024 05:00 PM',
-        sendBack: true,
-        previousStage: 'Credit',
-        iteration: 1
-      },
-      { 
-        id: '302', 
-        applicationId: 'APP-001', 
-        name: 'Customer Banking', 
-        status: 'completed', 
-        createdAt: '17/04/2024 05:00 PM', 
-        updatedAt: '17/04/2024 05:15 PM',
-        revisit: true,
-        iteration: 1
-      },
-    ]
-  },
-  {
-    id: '4',
-    name: 'Conversion',
-    duration: '2h 00m',
-    date: '17/04/2024',
-    time: '05:15 PM',
-    status: 'completed',
-    tasks: [
-      { id: '401', applicationId: 'APP-001', name: 'Terms generation', status: 'completed', createdAt: '17/04/2024 05:15 PM', updatedAt: '17/04/2024 05:25 PM' },
-      { id: '402', applicationId: 'APP-001', name: 'Initiate Offer Approval', status: 'completed', createdAt: '17/04/2024 05:25 PM', updatedAt: '17/04/2024 05:35 PM' },
-      { id: '403', applicationId: 'APP-001', name: 'Manager Approval', status: 'completed', createdAt: '17/04/2024 05:35 PM', updatedAt: '17/04/2024 05:45 PM' },
-      { id: '404', applicationId: 'APP-001', name: 'Action on Terms', status: 'completed', createdAt: '17/04/2024 05:45 PM', updatedAt: '17/04/2024 05:55 PM' },
-      { id: '405', applicationId: 'APP-001', name: 'Document upload', status: 'completed', createdAt: '17/04/2024 05:55 PM', updatedAt: '17/04/2024 06:05 PM' },
-    ]
-  },
-  {
-    id: '5',
-    name: 'RTO',
-    duration: '0h 30m',
-    date: '17/04/2024',
-    time: '06:05 PM',
-    status: 'completed',
-    tasks: [
-      { id: '501', applicationId: 'APP-001', name: 'RTO completion', status: 'completed', createdAt: '17/04/2024 06:05 PM', updatedAt: '17/04/2024 06:15 PM' },
-    ]
-  },
-  {
-    id: '6',
-    name: 'Risk',
-    duration: '1h 30m',
-    date: '17/04/2024',
-    time: '06:15 PM',
-    status: 'completed',
-    tasks: [
-      { id: '601', applicationId: 'APP-001', name: 'FCU Checks', status: 'completed', createdAt: '17/04/2024 06:15 PM', updatedAt: '17/04/2024 06:25 PM' },
-      { id: '602', applicationId: 'APP-001', name: 'RCU Checks', status: 'completed', createdAt: '17/04/2024 06:25 PM', updatedAt: '17/04/2024 06:35 PM' },
-      { id: '603', applicationId: 'APP-001', name: 'RTO Kit Approval', status: 'completed', createdAt: '17/04/2024 06:35 PM', updatedAt: '17/04/2024 06:45 PM' },
-      { id: '604', applicationId: 'APP-001', name: 'Final QC', status: 'completed', createdAt: '17/04/2024 06:45 PM', updatedAt: '17/04/2024 06:55 PM' },
-    ]
-  },
-  {
-    id: '7',
-    name: 'Fulfillment',
-    duration: '1h 45m',
-    date: '17/04/2024',
-    time: '06:55 PM',
-    status: 'completed',
-    tasks: [
-      { id: '701', applicationId: 'APP-001', name: 'Fulfillment KYC', status: 'completed', createdAt: '17/04/2024 06:55 PM', updatedAt: '17/04/2024 07:05 PM' },
-      { id: '702', applicationId: 'APP-001', name: 'Fulfillment NACH', status: 'completed', createdAt: '17/04/2024 07:05 PM', updatedAt: '17/04/2024 07:15 PM' },
-      { id: '703', applicationId: 'APP-001', name: 'Fulfillment Reference call', status: 'completed', createdAt: '17/04/2024 07:15 PM', updatedAt: '17/04/2024 07:25 PM' },
-      { id: '704', applicationId: 'APP-001', name: 'Fulfillment Agreement', status: 'completed', createdAt: '17/04/2024 07:25 PM', updatedAt: '17/04/2024 07:35 PM' },
-    ]
-  },
-  {
-    id: '8',
-    name: 'Disbursal',
-    duration: '0h 45m',
-    date: '17/04/2024',
-    time: '07:35 PM',
-    status: 'active',
-    tasks: [
-      { id: '801', applicationId: 'APP-001', name: 'Ready for Disbursal', status: 'pending', createdAt: '17/04/2024 07:35 PM', updatedAt: '17/04/2024 07:35 PM' },
-    ]
-  },
-  {
-    id: '9',
-    name: 'Sourcing (Revisit)',
-    duration: 'Pending',
-    date: '18/04/2024',
-    time: 'Pending',
-    status: 'pending',
-    tasks: [
-      { 
-        id: '901', 
-        applicationId: 'APP-001', 
-        name: 'Send Consent OTP', 
-        status: 'pending', 
-        createdAt: 'Pending', 
-        updatedAt: 'Pending',
-        sendBack: true,
-        previousStage: 'Disbursal',
-        iteration: 2
-      },
-    ]
-  },
-];
-
-// Sample application IDs for dropdown
-const sampleApplicationIds = [
-  'APP-001',
-  'APP-002',
-  'APP-003',
-  'APP-004',
-  'APP-005',
-];
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { 
+  CheckCircle, Clock, AlertTriangle, XCircle, ChevronUp, ChevronDown, 
+  User, MoreHorizontal, Search, Filter, Calendar, 
+  Download, RefreshCw, CornerUpLeft
+} from 'lucide-react';
 
 function App() {
-  const [expandedFunnels, setExpandedFunnels] = useState(
-    Object.fromEntries(funnelData.map(funnel => [funnel.id, true]))
-  );
+  const [expandedFunnels, setExpandedFunnels] = useState({});
   const [showFilters, setShowFilters] = useState(false);
   const [activeView, setActiveView] = useState('timeline'); // 'timeline' or 'flowchart'
   const [searchTerm, setSearchTerm] = useState('');
   const [applicationId, setApplicationId] = useState('');
   const [inputApplicationId, setInputApplicationId] = useState('');
+  const [funnelData, setFunnelData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchFunnelData();
+  }, [applicationId]); // Refetch when applicationId changes
+
+  const fetchFunnelData = async () => {
+    setLoading(true);
+    try {
+      // For testing, you can use a mock API endpoint or your actual endpoint
+      const url = `http://localhost:8081/activity/${applicationId}`;
+      
+      // In production, use this:
+      const response = await axios.get(url);
+      const transformedData = transformApiData(response.data);
+      
+      setFunnelData(transformedData);
+      
+      // Initialize expanded state for all funnels
+      const initialExpandedState = Object.fromEntries(
+        transformedData.map(funnel => [funnel.id, true])
+      );
+      setExpandedFunnels(initialExpandedState);
+      
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching funnel data:', err);
+      setError('Failed to load activity data. Please try again later.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Transform API data to the format expected by your component
+  const transformApiData = (apiData) => {
+    // Ensure apiData is an array
+    const dataArray = Array.isArray(apiData) ? apiData : [apiData];
+    
+    // If the array is empty, return an empty array
+    if (dataArray.length === 0) {
+      return [];
+    }
+    
+    return dataArray.map((item, index) => {
+      // Generate a unique ID for each funnel
+      const funnelId = `funnel-${index}-${item.funnel ? item.funnel.toLowerCase() : 'unknown'}`;
+      
+      // Ensure tasks is an array
+      const tasks = Array.isArray(item.tasks) ? item.tasks : [];
+      
+      // Determine funnel status based on tasks
+      const completedTasks = tasks.filter(task => task.status === 'COMPLETED').length;
+      const totalTasks = tasks.length;
+      
+      let funnelStatus = 'pending';
+      if (completedTasks === totalTasks && totalTasks > 0) {
+        funnelStatus = 'completed';
+      } else if (completedTasks > 0) {
+        funnelStatus = 'active';
+      }
+      
+      // Get current date for display purposes
+      const currentDate = new Date();
+      const formattedDate = currentDate.toLocaleDateString('en-GB');
+      const formattedTime = currentDate.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit'
+      });
+      
+      // Transform tasks
+      const transformedTasks = tasks.map(task => {
+        // Convert API task status to component status
+        let taskStatus = 'pending';
+        switch (task.status) {
+          case 'COMPLETED':
+            taskStatus = 'completed';
+            break;
+          case 'NEW':
+            taskStatus = 'pending';
+            break;
+          case 'FAILED':
+            taskStatus = 'error';
+            break;
+          case 'WARNING':
+            taskStatus = 'warning';
+            break;
+          default:
+            taskStatus = 'pending';
+        }
+        
+        // Format the date
+        let formattedUpdatedAt = 'N/A';
+        try {
+          const updatedDate = new Date(task.updatedAt);
+          formattedUpdatedAt = updatedDate.toLocaleString('en-GB');
+        } catch (e) {
+          console.warn('Invalid date format:', task.updatedAt);
+        }
+        
+        return {
+          id: task.taskId || `task-${Math.random().toString(36).substr(2, 9)}`,
+          name: formatTaskName(task.taskId || 'unknown-task'),
+          status: taskStatus,
+          createdAt: formattedUpdatedAt, // Using updatedAt as createdAt for simplicity
+          updatedAt: formattedUpdatedAt,
+          lastEditedBy: task.actorId ? `User ${task.actorId}` : 'System',
+          applicationId: applicationId || 'N/A',
+          sendBack: false, // Default value, adjust if your API provides this info
+          previousStage: '', // Default value, adjust if your API provides this info
+          iteration: null, // Default value, adjust if your API provides this info
+          revisit: false // Default value, adjust if your API provides this info
+        };
+      });
+      
+      // Sort tasks by order
+      transformedTasks.sort((a, b) => {
+        const taskA = tasks.find(t => t.taskId === a.id);
+        const taskB = tasks.find(t => t.taskId === b.id);
+        return ((taskA?.order || 0) - (taskB?.order || 0));
+      });
+      
+      return {
+        id: funnelId,
+        name: `${item.funnel || 'Unknown'} Funnel`,
+        status: funnelStatus,
+        date: formattedDate,
+        time: formattedTime,
+        duration: `${completedTasks}/${totalTasks} tasks completed`,
+        tasks: transformedTasks
+      };
+    });
+  };
+
+  // Helper function to format task IDs into readable names
+  const formatTaskName = (taskId) => {
+    if (!taskId) return 'Unknown Task';
+    
+    return taskId
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
 
   const toggleFunnel = (funnelId) => {
     setExpandedFunnels(prev => ({
@@ -219,7 +198,7 @@ function App() {
     funnel.tasks.some(task => 
       task.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       task.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.applicationId.toLowerCase().includes(searchTerm.toLowerCase())
+      (task.applicationId && task.applicationId.toLowerCase().includes(searchTerm.toLowerCase()))
     )
   );
 
@@ -228,6 +207,10 @@ function App() {
     if (inputApplicationId.trim()) {
       setApplicationId(inputApplicationId);
     }
+  };
+
+  const handleRefresh = () => {
+    fetchFunnelData();
   };
 
   return (
@@ -308,8 +291,13 @@ function App() {
               </button>
             </div>
             <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500">Last updated: 17/04/2024 07:35 PM</span>
-              <button className="p-1 rounded-full hover:bg-gray-100">
+              <span className="text-sm text-gray-500">
+                Last updated: {new Date().toLocaleDateString('en-GB')} {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+              </span>
+              <button 
+                className="p-1 rounded-full hover:bg-gray-100"
+                onClick={handleRefresh}
+              >
                 <RefreshCw className="w-4 h-4 text-gray-500" />
               </button>
             </div>
@@ -374,7 +362,25 @@ function App() {
             </div>
           )}
 
-          {activeView === 'timeline' ? (
+          {loading ? (
+            <div className="flex justify-center items-center p-12">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
+            </div>
+          ) : error ? (
+            <div className="p-6 text-center text-red-500">
+              <p>{error}</p>
+              <button 
+                onClick={handleRefresh}
+                className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md text-sm shadow-sm hover:bg-indigo-700"
+              >
+                Try Again
+              </button>
+            </div>
+          ) : filteredFunnels.length === 0 ? (
+            <div className="p-12 text-center text-gray-500">
+              <p>No activity data found. Try adjusting your search criteria.</p>
+            </div>
+          ) : activeView === 'timeline' ? (
             <div className="divide-y divide-gray-200">
               {filteredFunnels.map((funnel, index) => (
                 <div key={funnel.id} className="relative">
@@ -386,7 +392,7 @@ function App() {
                       <div className="flex-shrink-0">
                         {funnel.name.includes('Revisit') ? (
                           <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
-                            <ArrowUturnLeft className="h-5 w-5 text-amber-600" />
+                            <CornerUpLeft className="h-5 w-5 text-amber-600" />
                           </div>
                         ) : (
                           <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
@@ -448,7 +454,7 @@ function App() {
                               <div className="flex-shrink-0 mt-0.5">
                                 {task.sendBack ? (
                                   <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center">
-                                    <ArrowUturnLeft className="h-5 w-5 text-amber-600" />
+                                    <CornerUpLeft className="h-5 w-5 text-amber-600" />
                                   </div>
                                 ) : (
                                   <div className="h-10 w-10 rounded-full bg-gray-100 flex items-center justify-center">
@@ -498,7 +504,7 @@ function App() {
                                 
                                 {task.name === 'Pan Validation' && (
                                   <div className="mt-2 flex items-center">
-                                    <span className="text-xs text-gray-500">Task creation time: 10/04/2024</span>
+                                    <span className="text-xs text-gray-500">Task creation time: {task.createdAt}</span>
                                     <button className="ml-3 inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-orange-700 bg-orange-100 hover:bg-orange-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500">
                                       <RefreshCw className="mr-1 h-3 w-3" />
                                       Re-trigger
@@ -529,7 +535,7 @@ function App() {
                               <div className="flex items-center">
                                 {funnel.name.includes('Revisit') ? (
                                   <div className="h-10 w-10 rounded-full bg-amber-100 flex items-center justify-center mr-3">
-                                    <ArrowUturnLeft className="h-5 w-5 text-amber-600" />
+                                    <CornerUpLeft className="h-5 w-5 text-amber-600" />
                                   </div>
                                 ) : (
                                   <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
@@ -580,7 +586,7 @@ function App() {
                                     <p className="truncate">Created: {task.createdAt}</p>
                                     {task.sendBack && (
                                       <div className="mt-1 flex items-center">
-                                        <ArrowUturnLeft className="h-3 w-3 text-amber-600 mr-1" />
+                                        <CornerUpLeft className="h-3 w-3 text-amber-600 mr-1" />
                                         <span className="text-amber-600">From {task.previousStage}</span>
                                       </div>
                                     )}
