@@ -1,12 +1,14 @@
 import React from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, Filter } from 'lucide-react';
 
 function Header({ 
   inputApplicationId, 
   setInputApplicationId, 
   handleApplicationIdSubmit, 
   applicationId, 
-  handleRefresh 
+  handleRefresh,
+  toggleFilters,
+  showFilters
 }) {
   return (
     <header className="bg-white shadow-sm sticky top-0 z-10 py-2">
@@ -30,12 +32,22 @@ function Header({
               </button>
             </div>
             {applicationId && (
-              <button 
-                className="p-1 rounded-full hover:bg-gray-100"
-                onClick={handleRefresh}
-              >
-                <RefreshCw className="w-4 h-4 text-gray-500" />
-              </button>
+              <>
+                <button 
+                  className="p-1 rounded-full hover:bg-gray-100"
+                  onClick={handleRefresh}
+                  title="Refresh data"
+                >
+                  <RefreshCw className="w-4 h-4 text-gray-500" />
+                </button>
+                <button 
+                  className={`p-1 rounded-full hover:bg-gray-100 ${showFilters ? 'bg-gray-100' : ''}`}
+                  onClick={toggleFilters}
+                  title="Toggle filters"
+                >
+                  <Filter className={`w-4 h-4 ${showFilters ? 'text-indigo-600' : 'text-gray-500'}`} />
+                </button>
+              </>
             )}
           </div>
         </div>
