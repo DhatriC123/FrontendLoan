@@ -3,6 +3,8 @@ import axios from 'axios';
 import Header from './Header';
 import FunnelList from './FunnelList';
 import FilterPanel from './FilterPanel';
+import Dashboard from './Dashboard';
+import TabNavigation from './TabNavigation';
 
 function App() {
   const [expandedFunnels, setExpandedFunnels] = useState({});
@@ -12,6 +14,7 @@ function App() {
   const [filteredFunnelData, setFilteredFunnelData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [activeTab, setActiveTab] = useState('list'); // 'list' or 'dashboard'
   
   // Filter states with added actorId
   const [filters, setFilters] = useState({
@@ -271,6 +274,55 @@ function App() {
     setShowFilters(prev => !prev);
   };
 
+  // Get the data to display (filtered or original)
+  const displayData = filteredFunnelData.length > 0 || Object.values(filters).some(f => f !== '') 
+    ? filteredFunnelData 
+    : funnelData;
+
+  // Render the active tab content
+  const renderTabContent = () => {
+    if (!applicationId) {
+      return (
+        <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+          Please enter an application ID to view data.
+        </div>
+      );
+    }
+
+    if (loading) {
+      return (
+        <div className="flex flex-col items-center justify-center h-64">
+          <p className="text-gray-500">Loading data...</p>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <div className="bg-red-50 p-4 rounded-lg text-red-700 mb-4">
+          <p className="font-medium">Error</p>
+          <p>{error}</p>
+        </div>
+      );
+    }
+
+    if (activeTab === 'list') {
+      return (
+        <FunnelList 
+          applicationId={applicationId}
+          loading={false}
+          error={null}
+          funnelData={displayData}
+          expandedFunnels={expandedFunnels}
+          toggleFunnel={toggleFunnel}
+          handleRefresh={handleRefresh}
+        />
+      );
+    } else {
+      return <Dashboard funnelData={displayData} />;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header 
@@ -290,7 +342,14 @@ function App() {
           </div>
         )}
         
-        {showFilters && applicationId && (
+        {applicationId && (
+          <TabNavigation 
+            activeTab={activeTab} 
+            setActiveTab={setActiveTab} 
+          />
+        )}
+        
+        {showFilters && applicationId && activeTab === 'list' && (
           <FilterPanel 
             filters={filters}
             handleFilterChange={handleFilterChange}
@@ -298,15 +357,7 @@ function App() {
           />
         )}
         
-        <FunnelList 
-          applicationId={applicationId}
-          loading={loading}
-          error={error}
-          funnelData={filteredFunnelData.length > 0 || Object.values(filters).some(f => f !== '') ? filteredFunnelData : funnelData}
-          expandedFunnels={expandedFunnels}
-          toggleFunnel={toggleFunnel}
-          handleRefresh={handleRefresh}
-        />
+        {renderTabContent()}
       </main>
     </div>
   );
