@@ -43,9 +43,11 @@ function TaskItem({ task }) {
               {task.status}
             </span>
           </div>
-          <p className="text-xs text-gray-500 mt-0.5">
-            ID: {task.id} • Actor: {task.actorId} • Updated: {task.updatedAt}
-          </p>
+          <div className="text-xs text-gray-500 mt-0.5 grid grid-cols-1 md:grid-cols-2 gap-x-2">
+            <p>Task ID: {task.id}</p>
+            <p>Actor ID: {task.actorId}</p>
+            <p>Updated: {task.updatedAt}</p>
+          </div>
         </div>
       </div>
     </li>
