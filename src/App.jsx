@@ -15,11 +15,12 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('list'); // 'list' or 'dashboard'
+  const [hideNewStatus, setHideNewStatus] = useState(true); // Default to hide NEW status
   
-  // Comprehensive filter states with default sort order as 'asc' (oldest first)
+  // Comprehensive filter states with default to hide NEW status
   const [filters, setFilters] = useState({
     taskId: '',
-    status: '',
+    status: 'HIDE_NEW', // Default to hide NEW status
     updatedDate: '',
     actorId: '',
     funnelType: '',
@@ -40,7 +41,7 @@ function App() {
   // Apply filters whenever filters or funnelData changes
   useEffect(() => {
     applyFilters();
-  }, [filters, funnelData]);
+  }, [filters, funnelData, hideNewStatus]);
 
   const fetchFunnelData = async () => {
     setLoading(true);
@@ -193,19 +194,39 @@ function App() {
       }
     }
     
-    // If we have any basic active filters
-    if (filters.taskId || filters.status || filters.updatedDate || filters.actorId) {
+    // Apply status filter to hide NEW tasks if hideNewStatus is true or if status filter is HIDE_NEW
+    if (hideNewStatus || filters.status === 'HIDE_NEW') {
+      result = result.map(funnel => {
+        const filteredTasks = funnel.tasks.filter(task => task.status !== 'NEW');
+        
+        return {
+          ...funnel,
+          tasks: filteredTasks,
+          progress: `${filteredTasks.filter(t => t.status === 'COMPLETED').length}/${filteredTasks.length}`
+        };
+      });
+    }
+    // Apply specific status filter if it's not HIDE_NEW
+    else if (filters.status && filters.status !== 'HIDE_NEW') {
+      result = result.map(funnel => {
+        const filteredTasks = funnel.tasks.filter(task => task.status === filters.status);
+        
+        return {
+          ...funnel,
+          tasks: filteredTasks,
+          progress: `${filteredTasks.filter(t => t.status === 'COMPLETED').length}/${filteredTasks.length}`
+        };
+      });
+    }
+    
+    // If we have any other active filters
+    if (filters.taskId || filters.updatedDate || filters.actorId) {
       // Map through each funnel
       result = result.map(funnel => {
         // Filter the tasks based on criteria
         const filteredTasks = funnel.tasks.filter(task => {
           // Task ID filter
           if (filters.taskId && !task.id.toLowerCase().includes(filters.taskId.toLowerCase())) {
-            return false;
-          }
-          
-          // Status filter
-          if (filters.status && task.status !== filters.status) {
             return false;
           }
           
@@ -343,6 +364,11 @@ function App() {
   };
 
   const handleFilterChange = (name, value) => {
+    if (name === 'status') {
+      // If status is being changed, update hideNewStatus accordingly
+      setHideNewStatus(value === 'HIDE_NEW');
+    }
+    
     setFilters(prev => ({
       ...prev,
       [name]: value
@@ -350,9 +376,10 @@ function App() {
   };
 
   const clearFilters = () => {
+    setHideNewStatus(true); // Reset to hide NEW status
     setFilters({
       taskId: '',
-      status: '',
+      status: 'HIDE_NEW', // Reset to hide NEW status
       updatedDate: '',
       actorId: '',
       funnelType: '',
@@ -369,7 +396,7 @@ function App() {
   };
 
   // Get the data to display (filtered or original)
-  const displayData = filteredFunnelData.length > 0 || Object.values(filters).some(f => f !== '' && f !== 'updatedAt' && f !== 'asc') 
+  const displayData = filteredFunnelData.length > 0 || Object.values(filters).some(f => f !== '' && f !== 'updatedAt' && f !== 'asc' && f !== 'HIDE_NEW') || hideNewStatus
     ? filteredFunnelData 
     : funnelData;
 
@@ -455,6 +482,8 @@ function App() {
             filters={filters}
             handleFilterChange={handleFilterChange}
             clearFilters={clearFilters}
+            hideNewStatus={hideNewStatus}
+            setHideNewStatus={setHideNewStatus}
           />
         )}
         
