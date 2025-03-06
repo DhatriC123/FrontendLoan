@@ -42,15 +42,15 @@ function FilterPanel({ filters, handleFilterChange, clearFilters }) {
         </div>
         
         <div>
-          <label htmlFor="actorId" className="block text-xs font-medium text-gray-700 mb-1">
-            Actor ID
+          <label htmlFor="handledBy" className="block text-xs font-medium text-gray-700 mb-1">
+            Handled By
           </label>
           <input
             type="text"
-            id="actorId"
-            value={filters.actorId}
-            onChange={(e) => handleFilterChange('actorId', e.target.value)}
-            placeholder="Filter by actor ID"
+            id="handledBy"
+            value={filters.handledBy}
+            onChange={(e) => handleFilterChange('handledBy', e.target.value)}
+            placeholder="Filter by handler email"
             className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
           />
         </div>
@@ -66,6 +66,7 @@ function FilterPanel({ filters, handleFilterChange, clearFilters }) {
             className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
           >
             <option value="">All Statuses</option>
+            <option value="HIDE_NEW">Hide NEW Status</option>
             {statuses.map(status => (
               <option key={status} value={status}>
                 {status}
@@ -173,7 +174,7 @@ function FilterPanel({ filters, handleFilterChange, clearFilters }) {
                 <option value="updatedAt">Updated Date</option>
                 <option value="taskId">Task ID</option>
                 <option value="status">Status</option>
-                <option value="actorId">Actor ID</option>
+                <option value="handledBy">Handled By</option> {/* Changed from actorId to handledBy */}
               </select>
             </div>
             
@@ -182,14 +183,14 @@ function FilterPanel({ filters, handleFilterChange, clearFilters }) {
                 Sort Order
               </label>
               <select
-  id="sortOrder"
-  value={filters.sortOrder || 'asc'}
-  onChange={(e) => handleFilterChange('sortOrder', e.target.value)}
-  className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
->
-  <option value="asc">Oldest First</option>
-  <option value="desc">Newest First</option>
-</select>
+                id="sortOrder"
+                value={filters.sortOrder || 'asc'}
+                onChange={(e) => handleFilterChange('sortOrder', e.target.value)}
+                className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+              >
+                <option value="asc">Oldest First</option>
+                <option value="desc">Newest First</option>
+              </select>
             </div>
           </div>
         </details>
@@ -209,11 +210,11 @@ function FilterPanel({ filters, handleFilterChange, clearFilters }) {
           </div>
         )}
         
-        {filters.actorId && (
+        {filters.handledBy && (
           <div className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-indigo-100 text-indigo-800">
-            Actor ID: {filters.actorId}
+            Handled By: {filters.handledBy}
             <button 
-              onClick={() => handleFilterChange('actorId', '')}
+              onClick={() => handleFilterChange('handledBy', '')}
               className="ml-1 text-indigo-600 hover:text-indigo-800"
             >
               <X className="h-3 w-3" />
@@ -221,7 +222,7 @@ function FilterPanel({ filters, handleFilterChange, clearFilters }) {
           </div>
         )}
         
-        {filters.status && (
+        {filters.status && filters.status !== 'HIDE_NEW' && (
           <div className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-indigo-100 text-indigo-800">
             Status: {filters.status}
             <button 

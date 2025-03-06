@@ -45,7 +45,7 @@ function TaskItem({ task }) {
           </div>
           <div className="text-xs text-gray-500 mt-0.5 grid grid-cols-1 md:grid-cols-2 gap-x-2">
             <p>Task ID: {task.id}</p>
-            <p>Actor ID: {task.actorId}</p>
+            <p>Handled By: {task.handledBy}</p>
             <p>Updated: {task.updatedAt}</p>
           </div>
         </div>

@@ -22,7 +22,7 @@ function App() {
     taskId: '',
     status: 'HIDE_NEW', // Default to hide NEW status
     updatedDate: '',
-    actorId: '',
+    handledBy: '',
     funnelType: '',
     dateRange: '',
     startDate: '',
@@ -100,7 +100,7 @@ function App() {
           status: taskItem.status,
           updatedAt: formattedUpdatedAt,
           rawUpdatedAt: taskItem.updatedAt, // Keep the raw date for filtering
-          actorId: taskItem.actorId || 'N/A'
+          handledBy: taskItem.HandledBy || 'N/A' // Changed from actorId to handledBy
         };
       });
       
@@ -220,7 +220,7 @@ function App() {
     }
     
     // If we have any other active filters
-    if (filters.taskId || filters.updatedDate || filters.actorId) {
+    if (filters.taskId || filters.updatedDate || filters.handledBy) {
       // Map through each funnel
       result = result.map(funnel => {
         // Filter the tasks based on criteria
@@ -230,8 +230,8 @@ function App() {
             return false;
           }
           
-          // Actor ID filter
-          if (filters.actorId && !task.actorId.toString().toLowerCase().includes(filters.actorId.toLowerCase())) {
+          // HandledBy filter (changed from actorId)
+          if (filters.handledBy && !task.handledBy.toString().toLowerCase().includes(filters.handledBy.toLowerCase())) {
             return false;
           }
           
@@ -304,9 +304,9 @@ function App() {
               valueA = a.status;
               valueB = b.status;
               break;
-            case 'actorId':
-              valueA = a.actorId;
-              valueB = b.actorId;
+            case 'handledBy': // Changed from actorId to handledBy
+              valueA = a.handledBy;
+              valueB = b.handledBy;
               break;
             default:
               valueA = a.id;
@@ -381,7 +381,7 @@ function App() {
       taskId: '',
       status: 'HIDE_NEW', // Reset to hide NEW status
       updatedDate: '',
-      actorId: '',
+      handledBy: '', // Changed from actorId to handledBy
       funnelType: '',
       dateRange: '',
       startDate: '',
