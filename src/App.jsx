@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from './components/common/Header';
@@ -48,27 +47,38 @@ function App() {
   const fetchFunnelData = async () => {
     setLoading(true);
     try {
+      // Use the applicationId from state that gets updated when the user submits the form
       const url = `http://localhost:8080/applicationLog/${applicationId}`;
       const response = await axios.get(url);
-      const transformedData = transformApiData(response.data);
       
-      setFunnelData(transformedData);
-      
-      // Initialize expanded state for all funnels
-      const initialExpandedState = Object.fromEntries(
-        transformedData.map(funnel => [funnel.id, false]) // Default collapsed
-      );
-      setExpandedFunnels(initialExpandedState);
-      
-      setError(null);
+      // Check if we have valid data
+      if (response.data) {
+        const transformedData = transformApiData(response.data);
+        
+        setFunnelData(transformedData);
+        
+        // Initialize expanded state for all funnels
+        const initialExpandedState = Object.fromEntries(
+          transformedData.map(funnel => [funnel.id, false]) // Default collapsed
+        );
+        setExpandedFunnels(initialExpandedState);
+        
+        setError(null);
+      } else {
+        // Handle empty response
+        setFunnelData([]);
+        setExpandedFunnels({});
+        setError('No data found for this application ID.');
+      }
     } catch (err) {
       console.error('Error fetching funnel data:', err);
-      setError('Failed to load activity data. Please try again later.');
+      setFunnelData([]);
+      setExpandedFunnels({});
+      setError(`Failed to load data for application ID: ${applicationId}. ${err.message}`);
     } finally {
       setLoading(false);
     }
   };
-
   const applyFilters = () => {
     // Start with all funnel data - preserve original order
     let result = [...funnelData];
@@ -351,6 +361,7 @@ function App() {
             clearFilters={clearFilters}
             hideNewStatus={hideNewStatus}
             setHideNewStatus={setHideNewStatus}
+            funnelData={funnelData} // Pass the funnelData to the FilterPanel
           />
         )}
         
