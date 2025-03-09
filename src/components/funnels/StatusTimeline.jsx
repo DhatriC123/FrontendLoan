@@ -8,7 +8,7 @@ function StatusTimeline({ statusHistory }) {
   }
 
   return (
-    <div className="flex items-center overflow-x-auto py-3 px-2 max-w-full">
+    <div className="flex flex-wrap items-start gap-y-6 w-full py-3">
       {statusHistory.map((status, index) => {
         const isLast = index === statusHistory.length - 1;
         const formattedTime = new Date(status.updatedAt).toLocaleString('en-US', {
@@ -31,7 +31,7 @@ function StatusTimeline({ statusHistory }) {
         return (
           <React.Fragment key={index}>
             {/* Status node */}
-            <div className="flex flex-col items-center min-w-[90px] max-w-[120px]">
+            <div className="flex flex-col items-center" style={{ width: '100px' }}>
               <div className={`w-7 h-7 rounded-full flex items-center justify-center ${getStatusDotColor(status.status)}`}>
                 <div className="w-3.5 h-3.5 rounded-full bg-white"></div>
               </div>
@@ -43,7 +43,7 @@ function StatusTimeline({ statusHistory }) {
             
             {/* Arrow and duration */}
             {!isLast && (
-              <div className="flex flex-col items-center mx-4">
+              <div className="flex flex-col items-center" style={{ width: '60px' }}>
                 <div className="flex items-center h-7">
                   <div className="w-12 h-0.5 bg-gray-300"></div>
                   <div className="w-0 h-0 
