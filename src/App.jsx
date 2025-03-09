@@ -1,467 +1,195 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Header from './Header';
-import FunnelList from './FunnelList';
-import FilterPanel from './FilterPanel';
-import Dashboard from './Dashboard';
-import TabNavigation from './TabNavigation';
 
 function App() {
-  const [expandedFunnels, setExpandedFunnels] = useState({});
-  const [applicationId, setApplicationId] = useState('');
-  const [inputApplicationId, setInputApplicationId] = useState('');
-  const [funnelData, setFunnelData] = useState([]);
-  const [filteredFunnelData, setFilteredFunnelData] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('list'); // 'list' or 'dashboard'
-  
-  // Comprehensive filter states with default sort order as 'asc' (oldest first)
-  const [filters, setFilters] = useState({
-    taskId: '',
-    status: '',
-    updatedDate: '',
-    actorId: '',
-    funnelType: '',
-    dateRange: '',
-    startDate: '',
-    endDate: '',
-    sortBy: 'updatedAt',
-    sortOrder: 'asc' // Default to ascending (oldest first) to match backend order
-  });
-  const [showFilters, setShowFilters] = useState(false);
+  const [applicationId, setApplicationId] = React.useState("");
+  const [activityLogs, setActivityLogs] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState(null);
 
-  useEffect(() => {
-    if (applicationId) {
-      fetchFunnelData();
-    }
-  }, [applicationId]);
+  // Sample data structure for activity logs
+  const sampleLogs = [
+    { id: 1, funnel: "Data Ingestion", startTime: "2023-01-01T10:00:00", endTime: "2023-01-01T10:15:00" },
+    { id: 2, funnel: "Data Processing", startTime: "2023-01-01T10:15:00", endTime: "2023-01-01T10:45:00" },
+    { id: 3, funnel: "Model Training", startTime: "2023-01-01T10:45:00", endTime: "2023-01-01T11:30:00" },
+    { id: 4, funnel: "Evaluation", startTime: "2023-01-01T11:30:00", endTime: "2023-01-01T11:45:00" },
+    { id: 5, funnel: "Deployment", startTime: "2023-01-01T11:45:00", endTime: "2023-01-01T12:00:00" },
+    { id: 6, funnel: "Data Ingestion", startTime: "2023-01-01T13:00:00", endTime: "2023-01-01T13:10:00" },
+    { id: 7, funnel: "Data Processing", startTime: "2023-01-01T13:10:00", endTime: "2023-01-01T13:35:00" },
+    { id: 8, funnel: "Model Training", startTime: "2023-01-01T13:35:00", endTime: "2023-01-01T14:20:00" },
+  ];
 
-  // Apply filters whenever filters or funnelData changes
-  useEffect(() => {
-    applyFilters();
-  }, [filters, funnelData]);
-
-  const fetchFunnelData = async () => {
+  // Function to fetch activity logs based on application ID
+  const fetchActivityLogs = (id) => {
     setLoading(true);
-    try {
-      const url = `http://localhost:8080/applicationLog/${applicationId}`;
-      const response = await axios.get(url);
-      const transformedData = transformApiData(response.data);
-      
-      setFunnelData(transformedData);
-      
-      // Initialize expanded state for all funnels
-      const initialExpandedState = Object.fromEntries(
-        transformedData.map(funnel => [funnel.id, false]) // Default collapsed
-      );
-      setExpandedFunnels(initialExpandedState);
-      
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching funnel data:', err);
-      setError('Failed to load activity data. Please try again later.');
-    } finally {
+    setError(null);
+    
+    // Simulate API call with timeout
+    setTimeout(() => {
+      // In a real application, this would be an API call
+      if (id.trim() === "") {
+        setError("Please enter a valid Application ID");
+        setActivityLogs([]);
+      } else {
+        setActivityLogs(sampleLogs);
+      }
       setLoading(false);
-    }
+    }, 1000);
   };
 
-  const transformApiData = (apiData) => {
-    // Create an array of funnels from all categories in the response object
-    // Use Object.entries to preserve the order of keys from the response
-    const funnels = Object.entries(apiData).map(([categoryName, tasks]) => {
-      // Use the tasks array directly without reordering
-      const taskArray = tasks || [];
-      
-      const completedTasks = taskArray.filter(taskItem => taskItem.status === 'COMPLETED').length;
-      const totalTasks = taskArray.length;
-      
-      let funnelStatus = 'pending';
-      if (completedTasks === totalTasks && totalTasks > 0) {
-        funnelStatus = 'completed';
-      } else if (completedTasks > 0) {
-        funnelStatus = 'active';
-      }
-      
-      // Transform tasks while preserving their original order
-      const transformedTasks = taskArray.map(taskItem => {
-        let formattedUpdatedAt = 'N/A';
-        try {
-          const updatedDate = new Date(taskItem.updatedAt);
-          formattedUpdatedAt = updatedDate.toLocaleString('en-GB');
-        } catch (e) {
-          console.warn('Invalid date format:', taskItem.updatedAt);
-        }
-        
-        return {
-          id: taskItem.taskId || `task-${Math.random().toString(36).substr(2, 9)}`,
-          name: formatTaskName(taskItem.taskId || 'unknown-task'),
-          status: taskItem.status,
-          updatedAt: formattedUpdatedAt,
-          rawUpdatedAt: taskItem.updatedAt, // Keep the raw date for filtering
-          actorId: taskItem.actorId || 'N/A'
-        };
-      });
-      
-      return {
-        id: `funnel-${categoryName.toLowerCase()}`,
-        name: `${categoryName} Funnel`,
-        status: funnelStatus,
-        progress: `${completedTasks}/${totalTasks}`,
-        tasks: transformedTasks, // Preserve original order
-        originalCategory: categoryName // Store original category name for filtering
-      };
-    });
-    
-    // Return funnels in the original order from the API response
-    return funnels;
+  // Calculate task duration in minutes
+  const calculateDuration = (startTime, endTime) => {
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+    return (end - start) / (1000 * 60); // Convert milliseconds to minutes
   };
 
-  const applyFilters = () => {
-    // Start with all funnel data - preserve original order
-    let result = [...funnelData];
-    
-    // Filter by funnel type if specified
-    if (filters.funnelType) {
-      result = result.filter(funnel => 
-        funnel.originalCategory === filters.funnelType || 
-        funnel.name.toUpperCase().includes(filters.funnelType)
-      );
-    }
-    
-    // Apply date range filters if specified
-    if (filters.dateRange) {
-      const now = new Date();
-      let startDate;
-      
-      switch (filters.dateRange) {
-        case 'today':
-          startDate = new Date(now.setHours(0, 0, 0, 0));
-          break;
-        case 'yesterday':
-          startDate = new Date(now);
-          startDate.setDate(startDate.getDate() - 1);
-          startDate.setHours(0, 0, 0, 0);
-          break;
-        case 'last7days':
-          startDate = new Date(now);
-          startDate.setDate(startDate.getDate() - 7);
-          break;
-        case 'last30days':
-          startDate = new Date(now);
-          startDate.setDate(startDate.getDate() - 30);
-          break;
-        case 'custom':
-          if (filters.startDate) {
-            startDate = new Date(filters.startDate);
-          }
-          break;
-        default:
-          startDate = null;
-      }
-      
-      let endDate = null;
-      if (filters.dateRange === 'custom' && filters.endDate) {
-        endDate = new Date(filters.endDate);
-        // Set to end of day
-        endDate.setHours(23, 59, 59, 999);
-      }
-      
-      // Apply date range filter to tasks
-      if (startDate || endDate) {
-        result = result.map(funnel => {
-          const filteredTasks = funnel.tasks.filter(task => {
-            const taskDate = new Date(task.rawUpdatedAt);
-            
-            if (startDate && taskDate < startDate) {
-              return false;
-            }
-            
-            if (endDate && taskDate > endDate) {
-              return false;
-            }
-            
-            return true;
-          });
-          
-          return {
-            ...funnel,
-            tasks: filteredTasks,
-            progress: `${filteredTasks.filter(t => t.status === 'COMPLETED').length}/${filteredTasks.length}`
-          };
-        });
-      }
-    }
-    
-    // If we have any basic active filters
-    if (filters.taskId || filters.status || filters.updatedDate || filters.actorId) {
-      // Map through each funnel
-      result = result.map(funnel => {
-        // Filter the tasks based on criteria
-        const filteredTasks = funnel.tasks.filter(task => {
-          // Task ID filter
-          if (filters.taskId && !task.id.toLowerCase().includes(filters.taskId.toLowerCase())) {
-            return false;
-          }
-          
-          // Status filter
-          if (filters.status && task.status !== filters.status) {
-            return false;
-          }
-          
-          // Actor ID filter
-          if (filters.actorId && !task.actorId.toString().toLowerCase().includes(filters.actorId.toLowerCase())) {
-            return false;
-          }
-          
-          // Updated date filter
-          if (filters.updatedDate) {
-            // Try to parse the date from both formatted and raw date
-            let taskDate;
-            try {
-              // First try the raw date
-              taskDate = new Date(task.rawUpdatedAt);
-              if (isNaN(taskDate.getTime())) {
-                // If that fails, try to parse from the formatted date
-                const parts = task.updatedAt.split(/[/, :]/);
-                if (parts.length >= 3) {
-                  // Assuming DD/MM/YYYY format from en-GB locale
-                  taskDate = new Date(parts[2], parts[1] - 1, parts[0]);
-                }
-              }
-            } catch (e) {
-              // If all parsing fails, skip date filtering for this task
-              return false;
-            }
-            
-            // Skip tasks with invalid dates
-            if (!taskDate || isNaN(taskDate.getTime())) {
-              return false;
-            }
-            
-            const filterDate = new Date(filters.updatedDate);
-            
-            // Compare only the date part (ignoring time)
-            if (taskDate.getFullYear() !== filterDate.getFullYear() ||
-                taskDate.getMonth() !== filterDate.getMonth() ||
-                taskDate.getDate() !== filterDate.getDate()) {
-              return false;
-            }
-          }
-          
-          return true;
-        });
-        
-        // Return a new funnel object with filtered tasks (maintaining original order)
-        return {
-          ...funnel,
-          tasks: filteredTasks,
-          // Update progress based on filtered tasks
-          progress: `${filteredTasks.filter(t => t.status === 'COMPLETED').length}/${filteredTasks.length}`
-        };
-      });
-    }
-    
-    // Only apply sorting if the user has explicitly changed the sort settings from default
-    // or if they've explicitly set a sort order
-    if (filters.sortBy !== 'updatedAt' || (filters.sortOrder !== 'asc' && filters.sortOrder !== '')) {
-      result = result.map(funnel => {
-        const sortedTasks = [...funnel.tasks].sort((a, b) => {
-          let valueA, valueB;
-          
-          // Get the values to compare based on the sort field
-          switch (filters.sortBy) {
-            case 'updatedAt':
-              valueA = new Date(a.rawUpdatedAt).getTime();
-              valueB = new Date(b.rawUpdatedAt).getTime();
-              break;
-            case 'taskId':
-              valueA = a.id.toLowerCase();
-              valueB = b.id.toLowerCase();
-              break;
-            case 'status':
-              valueA = a.status;
-              valueB = b.status;
-              break;
-            case 'actorId':
-              valueA = a.actorId;
-              valueB = b.actorId;
-              break;
-            default:
-              valueA = a.id;
-              valueB = b.id;
-          }
-          
-          // Apply the sort order
-          if (filters.sortOrder === 'asc') {
-            return valueA > valueB ? 1 : -1;
-          } else {
-            return valueA < valueB ? 1 : -1;
-          }
-        });
-        
-        return {
-          ...funnel,
-          tasks: sortedTasks
-        };
-      });
-    }
-    
-    // Remove empty funnels (those with no tasks after filtering)
-    result = result.filter(funnel => funnel.tasks.length > 0);
-    
-    setFilteredFunnelData(result);
-  };
+  // Get unique funnel names for x-axis
+  const funnelNames = [...new Set(activityLogs.map(log => log.funnel))];
 
-  const formatTaskName = (taskId) => {
-    if (!taskId) return 'Unknown Task';
-    
-    return taskId
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
+  // Get min and max timestamps for y-axis scale
+  const timestamps = activityLogs.flatMap(log => [new Date(log.startTime), new Date(log.endTime)]);
+  const minTime = timestamps.length > 0 ? new Date(Math.min(...timestamps)) : new Date();
+  const maxTime = timestamps.length > 0 ? new Date(Math.max(...timestamps)) : new Date();
 
-  const toggleFunnel = (funnelId) => {
-    setExpandedFunnels(prev => ({
-      ...prev,
-      [funnelId]: !prev[funnelId]
-    }));
-  };
-
-  const handleApplicationIdSubmit = (e) => {
+  // Handle form submission
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (inputApplicationId.trim()) {
-      setApplicationId(inputApplicationId);
-    }
+    fetchActivityLogs(applicationId);
   };
 
-  const handleRefresh = () => {
-    if (applicationId) {
-      fetchFunnelData();
-    }
-  };
-
-  const handleFilterChange = (name, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const clearFilters = () => {
-    setFilters({
-      taskId: '',
-      status: '',
-      updatedDate: '',
-      actorId: '',
-      funnelType: '',
-      dateRange: '',
-      startDate: '',
-      endDate: '',
-      sortBy: 'updatedAt',
-      sortOrder: 'asc' // Reset to ascending (oldest first) to match backend order
-    });
-  };
-
-  const toggleFilters = () => {
-    setShowFilters(prev => !prev);
-  };
-
-  // Get the data to display (filtered or original)
-  const displayData = filteredFunnelData.length > 0 || Object.values(filters).some(f => f !== '' && f !== 'updatedAt' && f !== 'asc') 
-    ? filteredFunnelData 
-    : funnelData;
-
-  // Render the active tab content
-  const renderTabContent = () => {
-    if (!applicationId) {
-      return (
-        <div className="flex flex-col items-center justify-center h-64 text-gray-500">
-          Please enter an application ID to view data.
-        </div>
-      );
-    }
-
-    if (loading) {
-      return (
-        <div className="flex flex-col items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500"></div>
-          <p className="text-gray-500 mt-4">Loading data...</p>
-        </div>
-      );
-    }
-
-    if (error) {
-      return (
-        <div className="bg-red-50 p-4 rounded-lg text-red-700 mb-4">
-          <p className="font-medium">Error</p>
-          <p>{error}</p>
-          <button 
-            onClick={handleRefresh}
-            className="mt-2 px-3 py-1 bg-indigo-600 text-white rounded-md text-sm shadow-sm hover:bg-indigo-700"
-          >
-            Try Again
-          </button>
-        </div>
-      );
-    }
-
-    if (activeTab === 'list') {
-      return (
-        <FunnelList 
-          applicationId={applicationId}
-          loading={false}
-          error={null}
-          funnelData={displayData}
-          expandedFunnels={expandedFunnels}
-          toggleFunnel={toggleFunnel}
-          handleRefresh={handleRefresh}
-        />
-      );
-    } else {
-      return <Dashboard funnelData={displayData} />;
-    }
+  // Format time for display
+  const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header 
-        inputApplicationId={inputApplicationId}
-        setInputApplicationId={setInputApplicationId}
-        handleApplicationIdSubmit={handleApplicationIdSubmit}
-        applicationId={applicationId}
-        handleRefresh={handleRefresh}
-        toggleFilters={toggleFilters}
-        showFilters={showFilters}
-      />
+    <div className="mx-auto p-4 max-w-6xl">
+      <h1 className="text-2xl font-bold mb-6 text-gray-800">Activity Log Visualization</h1>
+      
+      <form onSubmit={handleSubmit} className="mb-6">
+        <div className="flex items-center space-x-2">
+          <input
+            type="text"
+            value={applicationId}
+            onChange={(e) => setApplicationId(e.target.value)}
+            placeholder="Enter Application ID"
+            className="flex-grow p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <button 
+            type="submit" 
+            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            disabled={loading}
+          >
+            {loading ? "Loading..." : "Visualize"}
+          </button>
+        </div>
+      </form>
 
-      <main className="max-w-7xl mx-auto px-4 py-4">
-        {applicationId && (
-          <div className="mb-3 px-3 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-md text-sm font-medium">
-            Application ID: {applicationId}
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        </div>
+      ) : activityLogs.length > 0 ? (
+        <div className="bg-white p-4 rounded-lg shadow-md">
+          <h2 className="text-lg font-semibold mb-4">Activity Timeline for Application ID: {applicationId}</h2>
+          
+          <div className="relative" style={{ height: "500px" }}>
+            {/* X-axis (Funnel Names) */}
+            <div className="absolute bottom-0 left-16 right-0 flex justify-between">
+              {funnelNames.map((funnel, index) => (
+                <div 
+                  key={index} 
+                  className="text-sm text-gray-600 transform -rotate-45 origin-top-left"
+                  style={{ 
+                    left: `${(index / (funnelNames.length - 1)) * 100}%`,
+                    position: 'absolute',
+                    bottom: '-40px'
+                  }}
+                >
+                  {funnel}
+                </div>
+              ))}
+            </div>
+            
+            {/* Y-axis (Timestamps) */}
+            <div className="absolute top-0 bottom-0 left-0 w-16 flex flex-col justify-between">
+              {Array.from({ length: 6 }).map((_, index) => {
+                const timeOffset = (maxTime - minTime) * (index / 5);
+                const timePoint = new Date(maxTime - timeOffset);
+                return (
+                  <div key={index} className="text-xs text-gray-600 flex items-center justify-end pr-2">
+                    {formatTime(timePoint)}
+                  </div>
+                );
+              })}
+            </div>
+            
+            {/* Graph area */}
+            <div className="absolute top-0 bottom-0 left-16 right-0 border-l border-b border-gray-300">
+              {activityLogs.map((log, index) => {
+                const startDate = new Date(log.startTime);
+                const endDate = new Date(log.endTime);
+                const duration = calculateDuration(log.startTime, log.endTime);
+                
+                // Calculate position
+                const funnelIndex = funnelNames.indexOf(log.funnel);
+                const xPosition = `${(funnelIndex / (funnelNames.length - 1)) * 100}%`;
+                
+                const timeRange = maxTime - minTime;
+                const yStart = ((maxTime - startDate) / timeRange) * 100;
+                const yEnd = ((maxTime - endDate) / timeRange) * 100;
+                const height = yStart - yEnd;
+                
+                return (
+                  <div 
+                    key={index}
+                    className="absolute bg-blue-500 rounded opacity-80 hover:opacity-100 cursor-pointer transition-opacity"
+                    style={{
+                      left: `calc(${xPosition} - 15px)`,
+                      top: `${yEnd}%`,
+                      height: `${height}%`,
+                      width: '30px',
+                    }}
+                    title={`${log.funnel}: ${formatTime(log.startTime)} - ${formatTime(log.endTime)} (${duration.toFixed(1)} min)`}
+                  >
+                    <div className="absolute inset-0 flex items-center justify-center text-xs text-white font-bold">
+                      {duration > 10 ? `${duration.toFixed(0)}m` : ''}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        )}
-        
-        {applicationId && (
-          <TabNavigation 
-            activeTab={activeTab} 
-            setActiveTab={setActiveTab} 
-          />
-        )}
-        
-        {showFilters && applicationId && activeTab === 'list' && (
-          <FilterPanel 
-            filters={filters}
-            handleFilterChange={handleFilterChange}
-            clearFilters={clearFilters}
-          />
-        )}
-        
-        {renderTabContent()}
-      </main>
+          
+          <div className="mt-16 pt-4 border-t border-gray-200">
+            <h3 className="text-md font-semibold mb-2">Legend</h3>
+            <div className="flex flex-wrap gap-4">
+              {funnelNames.map((funnel, index) => (
+                <div key={index} className="flex items-center">
+                  <div className="w-4 h-4 bg-blue-500 rounded mr-2"></div>
+                  <span className="text-sm">{funnel}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : applicationId ? (
+        <div className="bg-gray-100 p-4 rounded-lg text-center text-gray-600">
+          No activity logs found for the given Application ID.
+        </div>
+      ) : (
+        <div className="bg-gray-100 p-4 rounded-lg text-center text-gray-600">
+          Enter an Application ID to visualize activity logs.
+        </div>
+      )}
     </div>
   );
 }
-
-export default App;
