@@ -16,7 +16,7 @@ function Header({
         <div className="flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="flex-1 min-w-0">
             <h1 className="text-lg font-bold leading-6 text-gray-900 sm:truncate">
-              Funnel Tracker
+              Loan Application Tracking
             </h1>
           </div>
           

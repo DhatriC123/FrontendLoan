@@ -25,15 +25,19 @@ export function getStatusColor(status) {
 
 export function getStatusDotColor(status) {
   switch (status) {
-    case 'COMPLETED':
-      return 'bg-green-500';
     case 'NEW':
-      return 'bg-blue-500';
-    case 'PENDING':
-      return 'bg-yellow-500';
-    case 'FAILED':
-      return 'bg-red-500';
+      return 'bg-blue-400';     
+    case 'TODO':
+      return 'bg-indigo-500';   
+    case 'IN_PROGRESS':
+      return 'bg-amber-500';    
+    case 'COMPLETED':
+      return 'bg-emerald-500'; 
+    case 'SKIPPED':
+      return 'bg-slate-400';    
     default:
-      return 'bg-gray-500';
+      return 'bg-gray-400';     
   }
 }
+
+
