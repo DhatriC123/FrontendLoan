@@ -16,10 +16,10 @@ function App() {
   const [filteredFunnelData, setFilteredFunnelData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [activeTab, setActiveTab] = useState('list'); // 'list' or 'dashboard'
-  const [hideNewStatus, setHideNewStatus] = useState(true); // Default to hide NEW status
+  const [activeTab, setActiveTab] = useState('list'); 
+  const [hideNewStatus, setHideNewStatus] = useState(true); 
   
-  // Comprehensive filter states with default to hide NEW status
+  
   const [filters, setFilters] = useState({
     taskId: '',
     status: 'HIDE_NEW', // Default to hide NEW status
@@ -50,7 +50,7 @@ function App() {
     try {
       const url = `http://localhost:8080/applicationLog/${applicationId}`;
       const response = await axios.get(url);
-      const transformedData = transformApiData(response.data);
+      const transformedData = transformApiData(response.data.data.tasksByFunnel);
       
       setFunnelData(transformedData);
       
