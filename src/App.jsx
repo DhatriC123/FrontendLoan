@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from './components/common/Header';
 import FilterPanel from './components/filters/FilterPanel';
-import Dashboard from './components/dashboard/Dashboard';
+import Dashboard from './Dashboard';
 import TabNavigation from './components/common/TabNavigation';
 import FunnelView from './components/funnels/FunnelView';
 import { transformApiData } from './utils/apiTransformers';
