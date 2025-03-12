@@ -1,7 +1,7 @@
 import React, { useState ,useEffect} from 'react';
 import GanttChart from './components/graph/GanttChart';
 import { fetchTasksByApplicationId } from './services/api';
-import mockTaskData from './mockGanttChartData';
+import mockTaskData from './mockData/mockGanttChartData';
 
 function Dashboard() {
   const [applicationId, setApplicationId] = useState('');
@@ -12,7 +12,7 @@ function Dashboard() {
   
   //mock data
   useEffect(() => {
-    setTaskData(mockTaskData); // ✅ Updates only once
+    setTaskData(mockTaskData); 
   }, []);
   
 
