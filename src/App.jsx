@@ -314,7 +314,7 @@ function App() {
         />
       );
     } else {
-      return <Dashboard funnelData={displayData} />;
+      return <Dashboard applicationId={applicationId} />;
     }
   };
 
