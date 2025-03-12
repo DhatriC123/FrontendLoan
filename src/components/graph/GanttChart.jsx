@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TaskTimeline from './TaskTimeline.jsx';
-import FunnelSummary from './FunnelSummary';
-import { processDataForChart, funnelColors, statusColors } from './utils';
+import FunnelSummary from './FunnelSummary.jsx';
+import { processDataForChart, funnelColors, statusColors } from '../utils.js';
 
 const GanttChart = ({ data }) => {
   const [tasks, setTasks] = useState([]);

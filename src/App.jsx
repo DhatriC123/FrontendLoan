@@ -7,6 +7,7 @@ import Dashboard from './Dashboard';
 import TabNavigation from './components/common/TabNavigation';
 import FunnelView from './components/funnels/FunnelView';
 import { transformApiData } from './utils/apiTransformers';
+import mocklogdata from './mocklogdata';
 
 function App() {
   const [expandedFunnels, setExpandedFunnels] = useState({});
@@ -22,7 +23,7 @@ function App() {
   
   const [filters, setFilters] = useState({
     taskId: '',
-    status: 'HIDE_NEW', // Default to hide NEW status
+    status: 'HIDE_NEW', 
     updatedDate: '',
     actorId: '',
     funnelType: '',
@@ -30,7 +31,7 @@ function App() {
     startDate: '',
     endDate: '',
     sortBy: 'updatedAt',
-    sortOrder: 'asc' // Default to ascending (oldest first) to match backend order
+    sortOrder: 'asc' 
   });
   const [showFilters, setShowFilters] = useState(false);
 
@@ -48,9 +49,9 @@ function App() {
   const fetchFunnelData = async () => {
     setLoading(true);
     try {
-      const url = `http://localhost:8080/applicationLog/${applicationId}`;
-      const response = await axios.get(url);
-      const transformedData = transformApiData(response.data.data.tasksByFunnel);
+      // const url = `http://localhost:8080/applicationLog/${applicationId}`;
+      // const response = await axios.get(url);
+      const transformedData = transformApiData(mocklogdata);                            // replaced for mock data
       
       setFunnelData(transformedData);
       
@@ -314,7 +315,7 @@ function App() {
         />
       );
     } else {
-      return <Dashboard funnelData={displayData} />;
+      return <Dashboard />;
     }
   };
 
