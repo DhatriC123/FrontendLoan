@@ -1,48 +1,58 @@
 
 import { formatTaskName } from './formatters';
 
-export function transformApiData(apiData) {
-  // Create an array of funnels from all categories in the response object
-  return Object.entries(apiData).map(([funnelName, tasks]) => {
-    // Group tasks by taskId
-    const taskGroups = {};
-    
-    tasks.forEach(task => {
-      if (!taskGroups[task.taskId]) {
-        taskGroups[task.taskId] = {
-          id: task.taskId,
-          name: formatTaskName(task.taskId),
-          handledBy: task.handledBy || 'N/A',
-          createdAt: task.createdAt,
-          order: task.order,
-          currentStatus: getCurrentStatus(task.statusHistory),
-          statusHistory: task.statusHistory || [],
-          duration: task.duration, // Make sure to include this
-          sendbacks: task.sendbacks,
-        };
+// apiTransformers.js
+export const transformApiData = (data) => {
+  // Create an array to hold all funnels
+  const funnels = [];
+  
+  // Process each funnel in the data
+  for (const [funnelKey, funnelData] of Object.entries(data)) {
+    if (typeof funnelData === 'object' && funnelData !== null) {
+      // Create a funnel object
+      const funnel = {
+        id: funnelKey,
+        name: funnelData.funnel || funnelKey,
+        funnelDuration: funnelData.funnelDuration || 0,
+        tasks: []
+      };
+      
+      // Process tasks if they exist
+      if (Array.isArray(funnelData.tasks)) {
+        funnel.tasks = funnelData.tasks.map(task => {
+          // Get the current status from the last status history entry
+          const currentStatus = task.statusHistory && task.statusHistory.length > 0 
+            ? task.statusHistory[task.statusHistory.length - 1].status 
+            : 'UNKNOWN';
+            
+          return {
+            id: task.taskId,
+            name: task.taskId,
+            taskId: task.taskId,
+            order: task.order,
+            handledBy: task.handledBy,
+            createdAt: task.createdAt,
+            statusHistory: task.statusHistory || [],
+            currentStatus: currentStatus,
+            duration: task.duration,
+            sendbacks: task.sendbacks,
+            visited: task.visited
+          };
+        });
+        
+        // Sort tasks by order if available
+        funnel.tasks.sort((a, b) => (a.order || 0) - (b.order || 0));
       }
-    });
-    
-    // Convert task groups object to array and sort by order
-    const sortedTasks = Object.values(taskGroups).sort((a, b) => a.order - b.order);
-    
-    // Calculate completion stats
-    const completedTasks = sortedTasks.filter(task => 
-      task.currentStatus === 'COMPLETED'
-    ).length;
-    
-    return {
-      id: `funnel-${funnelName.toLowerCase()}`,
-      name: funnelName,
-      status: completedTasks === sortedTasks.length ? 'completed' : 'in-progress',
-      progress: `${completedTasks}/${sortedTasks.length}`,
-      tasks: sortedTasks
-    };
-  });
-}
-
-// Helper function to get current status from status history
-export function getCurrentStatus(statusHistory) {
-  if (!statusHistory || statusHistory.length === 0) return 'UNKNOWN';
-  return statusHistory[statusHistory.length - 1].status;
-}
+      
+      // Calculate progress
+      const totalTasks = funnel.tasks.length;
+      const completedTasks = funnel.tasks.filter(task => task.currentStatus === 'COMPLETED').length;
+      funnel.progress = `${completedTasks}/${totalTasks}`;
+      funnel.status = completedTasks === totalTasks && totalTasks > 0 ? 'completed' : 'in-progress';
+      
+      funnels.push(funnel);
+    }
+  }
+  
+  return funnels;
+};

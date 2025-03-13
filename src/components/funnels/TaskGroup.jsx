@@ -1,3 +1,4 @@
+// TaskGroup.jsx
 import React from 'react';
 import StatusTimeline from './StatusTimeline';
 import { getStatusColor } from '../../utils/formatters';
@@ -12,29 +13,27 @@ function TaskGroup({ task, isExpanded, onToggle }) {
     hour12: true
   });
 
-  // Format duration if it's a number (assuming it's in seconds)
-  const formatDuration = (duration) => {
-    if (duration === undefined || duration === null) return 'N/A';
+  // Format duration based on seconds
+  const formatDuration = (seconds) => {
+    if (seconds === undefined || seconds === null) return 'N/A';
     
-    // If duration is already a formatted string, return it as is
-    if (typeof duration === 'string') return duration;
+    if (seconds === 0) return '0 sec';
     
-    // If duration is a number, format it
-    if (typeof duration === 'number') {
-      if (duration < 60) {
-        return `${duration} sec`;
-      } else if (duration < 3600) {
-        const minutes = Math.floor(duration / 60);
-        const seconds = duration % 60;
-        return seconds > 0 ? `${minutes} min ${seconds} sec` : `${minutes} min`;
-      } else {
-        const hours = Math.floor(duration / 3600);
-        const minutes = Math.floor((duration % 3600) / 60);
-        return minutes > 0 ? `${hours} hr ${minutes} min` : `${hours} hr`;
-      }
+    if (seconds < 60) {
+      return `${seconds} sec`;
+    } else if (seconds < 3600) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return remainingSeconds > 0 
+        ? `${minutes} min ${remainingSeconds} sec` 
+        : `${minutes} min`;
+    } else {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      return minutes > 0 
+        ? `${hours} hr ${minutes} min` 
+        : `${hours} hr`;
     }
-    
-    return 'N/A';
   };
 
   return (
@@ -57,7 +56,7 @@ function TaskGroup({ task, isExpanded, onToggle }) {
                 Duration: {formatDuration(task.duration)}
               </span>
               <span className="text-xs px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full">
-                Sendbacks: {task.sendbacks ?? 'N/A'}
+                Sendbacks: {task.sendbacks !== undefined ? task.sendbacks : 'N/A'}
               </span>
             </div>
           </div>
@@ -70,7 +69,7 @@ function TaskGroup({ task, isExpanded, onToggle }) {
         <div className="flex items-center space-x-3">
           <span className="text-sm text-gray-600">Handled by: {task.handledBy}</span>
           <span className={`px-2 py-0.5 rounded-full text-xs ${getStatusColor(task.currentStatus)}`}>
-            {task.currentStatus || (task.statusHistory && task.statusHistory.length > 0 ? task.statusHistory[task.statusHistory.length - 1].status : 'Unknown')}
+            {task.currentStatus}
           </span>
         </div>
       </div>

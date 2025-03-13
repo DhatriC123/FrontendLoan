@@ -3,14 +3,37 @@ import TaskGroup from './TaskGroup';
 
 function FunnelCard({ funnel, isExpanded, onToggle }) {
   const [expandedTasks, setExpandedTasks] = useState({});
-  
+
   const toggleTask = (taskId) => {
     setExpandedTasks(prev => ({
       ...prev,
       [taskId]: !prev[taskId]
     }));
   };
-  
+
+  // Format duration based on seconds
+  const formatDuration = (seconds) => {
+    if (seconds === undefined || seconds === null) return '';
+    
+    if (seconds === 0) return '(0 sec)';
+    
+    if (seconds < 60) {
+      return `(${seconds} sec)`;
+    } else if (seconds < 3600) {
+      const minutes = Math.floor(seconds / 60);
+      const remainingSeconds = seconds % 60;
+      return remainingSeconds > 0 
+        ? `(${minutes} min ${remainingSeconds} sec)` 
+        : `(${minutes} min)`;
+    } else {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      return minutes > 0 
+        ? `(${hours} hr ${minutes} min)` 
+        : `(${hours} hr)`;
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow overflow-hidden border-2 border-indigo-100">
       {/* Funnel Header - Make it more prominent */}
@@ -24,7 +47,14 @@ function FunnelCard({ funnel, isExpanded, onToggle }) {
               <polyline points="9 18 15 12 9 6"></polyline>
             </svg>
           </span>
-          <h3 className="font-semibold text-lg text-indigo-900">{funnel.name}</h3>
+          <div>
+            <h3 className="font-semibold text-lg text-indigo-900">
+              {funnel.name} 
+              <span className="ml-2 text-sm font-normal text-indigo-600">
+                {formatDuration(funnel.funnelDuration)}
+              </span>
+            </h3>
+          </div>
         </div>
         <div className="flex items-center space-x-3">
           <span className="text-sm font-medium text-indigo-700">{funnel.progress}</span>
@@ -37,7 +67,7 @@ function FunnelCard({ funnel, isExpanded, onToggle }) {
           </span>
         </div>
       </div>
-      
+    
       {/* Task Groups - Add indentation and styling to create hierarchy */}
       {isExpanded && (
         <div className="divide-y divide-gray-100 pl-4 pr-2 py-2 bg-white">
