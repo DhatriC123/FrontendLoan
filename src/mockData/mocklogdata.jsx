@@ -24,7 +24,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T10:07:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 2 ,
+            "sendbacks": 3,
+            "visited": 0
         },
         {
             "taskId": "consent_verify_otp",
@@ -48,7 +51,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T10:15:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 50,
+            "sendbacks": 1,
+            "visited": 0
         },
         {
             "taskId": "basic_detail_submit",
@@ -72,7 +78,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T10:23:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "dob_check",
@@ -92,7 +101,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T10:29:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "ogl_check",
@@ -112,7 +124,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T10:35:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "fraud_check",
@@ -132,7 +147,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T10:41:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "current_address_capture",
@@ -168,7 +186,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T13:01:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "additional_contact_detail_capture",
@@ -192,7 +213,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T10:57:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "personal_detail_capture",
@@ -216,7 +240,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T11:05:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "employment_detail_capture",
@@ -240,7 +267,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T11:13:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "banking_mandatory",
@@ -264,7 +294,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T11:21:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "add_asset",
@@ -288,7 +321,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T11:29:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "init_credit_flow",
@@ -308,7 +344,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T11:41:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "cibil_pull",
@@ -328,7 +367,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T11:35:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         }
     ],
     "CONVERSION": [
@@ -354,7 +396,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T12:55:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "initiate_offer_approval",
@@ -378,7 +423,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T12:31:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "terms_generation",
@@ -402,7 +450,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T12:39:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "action_on_terms",
@@ -426,7 +477,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T12:47:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "doc_upload",
@@ -450,7 +504,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T13:09:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "additional_info",
@@ -474,7 +531,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T13:17:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "add_beneficiary_details",
@@ -498,7 +558,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T13:25:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         }
     ],
     "CREDIT": [
@@ -520,7 +583,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T11:47:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "cars24_cibil_based_offer",
@@ -540,7 +606,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T11:53:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "start_credit_workflow",
@@ -560,7 +629,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T11:59:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "dc_approve",
@@ -584,7 +656,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T12:07:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "tvr_approve",
@@ -608,7 +683,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T12:15:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         },
         {
             "taskId": "tvr_offer_approve",
@@ -632,7 +710,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T12:23:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         }
     ],
     "RISK": [
@@ -658,7 +739,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T13:33:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         }
     ],
     "RTO": [
@@ -684,7 +768,10 @@ const mocklogdata = {
                     "status": "COMPLETED",
                     "updatedAt": "2025-03-10T13:41:00.000+00:00"
                 }
-            ]
+            ],
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
         }
     ]
 }

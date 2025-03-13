@@ -16,7 +16,9 @@ export function transformApiData(apiData) {
           createdAt: task.createdAt,
           order: task.order,
           currentStatus: getCurrentStatus(task.statusHistory),
-          statusHistory: task.statusHistory || []
+          statusHistory: task.statusHistory || [],
+          duration: task.duration, // Make sure to include this
+          sendbacks: task.sendbacks,
         };
       }
     });
