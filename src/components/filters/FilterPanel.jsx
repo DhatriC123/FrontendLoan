@@ -1,13 +1,24 @@
-
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 function FilterPanel({ 
   filters, 
   handleFilterChange, 
   clearFilters, 
   hideNewStatus, 
-  setHideNewStatus 
+  setHideNewStatus,
+  funnelData
 }) {
+  // Extract unique funnel types from funnelData
+  const [funnelTypes, setFunnelTypes] = useState([]);
+
+  useEffect(() => {
+    if (funnelData && funnelData.length > 0) {
+      // Extract unique funnel names
+      const uniqueFunnelTypes = [...new Set(funnelData.map(funnel => funnel.name))];
+      setFunnelTypes(uniqueFunnelTypes);
+    }
+  }, [funnelData]);
+
   return (
     <div className="bg-white p-4 rounded-lg shadow mb-4">
       <div className="flex justify-between items-center mb-4">
@@ -19,7 +30,7 @@ function FilterPanel({
           Clear All
         </button>
       </div>
-      
+    
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {/* Task ID Filter */}
         <div>
@@ -34,7 +45,7 @@ function FilterPanel({
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
-        
+      
         {/* Status Filter */}
         <div>
           <label htmlFor="status" className="block text-sm font-medium text-gray-700">
@@ -54,35 +65,40 @@ function FilterPanel({
             <option value="FAILED">FAILED</option>
           </select>
         </div>
-        
-        {/* Actor ID Filter */}
+      
+        {/* Handled By Filter (replacing Actor ID) */}
         <div>
           <label htmlFor="actorId" className="block text-sm font-medium text-gray-700">
-            Actor ID
+            Handled By
           </label>
           <input
             type="text"
             id="actorId"
             value={filters.actorId}
             onChange={(e) => handleFilterChange('actorId', e.target.value)}
+            placeholder="email@example.com"
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
-        
-        {/* Funnel Type Filter */}
+      
+        {/* Funnel Type Filter as Dropdown */}
         <div>
           <label htmlFor="funnelType" className="block text-sm font-medium text-gray-700">
             Funnel Type
           </label>
-          <input
-            type="text"
+          <select
             id="funnelType"
             value={filters.funnelType}
             onChange={(e) => handleFilterChange('funnelType', e.target.value)}
             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-          />
+          >
+            <option value="">All Funnel Types</option>
+            {funnelTypes.map((type, index) => (
+              <option key={index} value={type}>{type}</option>
+            ))}
+          </select>
         </div>
-        
+      
         {/* Date Range Filter */}
         <div>
           <label htmlFor="dateRange" className="block text-sm font-medium text-gray-700">
@@ -102,7 +118,7 @@ function FilterPanel({
             <option value="custom">Custom Range</option>
           </select>
         </div>
-        
+      
         {/* Sort Options */}
         <div>
           <label htmlFor="sortBy" className="block text-sm font-medium text-gray-700">
@@ -118,7 +134,7 @@ function FilterPanel({
               <option value="updatedAt">Updated At</option>
               <option value="taskId">Task ID</option>
               <option value="status">Status</option>
-              <option value="actorId">Actor ID</option>
+              <option value="actorId">Handled By</option>
             </select>
             <select
               value={filters.sortOrder}
@@ -131,7 +147,7 @@ function FilterPanel({
           </div>
         </div>
       </div>
-      
+    
       {/* Custom Date Range (conditionally rendered) */}
       {filters.dateRange === 'custom' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
