@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import GanttChart from './components/GanttChart';
 import { fetchTasksByApplicationId } from './services/api';
+import mockTaskData from './mockData/mockGanttChartData';
 
 function Dashboard({ applicationId }) {  // Destructure the props object
   const [taskData, setTaskData] = useState(null);

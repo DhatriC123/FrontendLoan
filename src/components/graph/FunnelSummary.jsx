@@ -1,5 +1,5 @@
 import React from 'react';
-import { funnelColors, statusColors } from './utils';
+import { funnelColors, statusColors } from '../utils';
 
 const FunnelSummary = ({ funnels, tasks }) => {
   return (

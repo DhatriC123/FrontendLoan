@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Header from './components/common/Header';
@@ -7,6 +6,8 @@ import Dashboard from './Dashboard';
 import TabNavigation from './components/common/TabNavigation';
 import FunnelView from './components/funnels/FunnelView';
 import { transformApiData } from './utils/apiTransformers';
+import mocklogdata from './mockData/mocklogdata';
+//import AnalyticsView from './components/AnalyticsView';
 
 function App() {
   const [expandedFunnels, setExpandedFunnels] = useState({});
@@ -18,11 +19,10 @@ function App() {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('list'); 
   const [hideNewStatus, setHideNewStatus] = useState(true); 
-  
-  
+
   const [filters, setFilters] = useState({
     taskId: '',
-    status: 'HIDE_NEW', // Default to hide NEW status
+    status: 'HIDE_NEW', 
     updatedDate: '',
     actorId: '',
     funnelType: '',
@@ -30,7 +30,7 @@ function App() {
     startDate: '',
     endDate: '',
     sortBy: 'updatedAt',
-    sortOrder: 'asc' // Default to ascending (oldest first) to match backend order
+    sortOrder: 'asc' 
   });
   const [showFilters, setShowFilters] = useState(false);
 
@@ -48,18 +48,18 @@ function App() {
   const fetchFunnelData = async () => {
     setLoading(true);
     try {
-      const url = `http://localhost:8080/applicationLog/${applicationId}`;
-      const response = await axios.get(url);
-      const transformedData = transformApiData(response.data.data.tasksByFunnel);
-      
+      // const url = `http://localhost:8080/applicationLog/${applicationId}`;
+      // const response = await axios.get(url);
+      const transformedData = transformApiData(mocklogdata);                            // replaced for mock data
+    
       setFunnelData(transformedData);
-      
+    
       // Initialize expanded state for all funnels
       const initialExpandedState = Object.fromEntries(
         transformedData.map(funnel => [funnel.id, false]) // Default collapsed
       );
       setExpandedFunnels(initialExpandedState);
-      
+    
       setError(null);
     } catch (err) {
       console.error('Error fetching funnel data:', err);
@@ -72,19 +72,19 @@ function App() {
   const applyFilters = () => {
     // Start with all funnel data - preserve original order
     let result = [...funnelData];
-    
+  
     // Filter by funnel type if specified
     if (filters.funnelType) {
       result = result.filter(funnel => 
-        funnel.name.toUpperCase().includes(filters.funnelType.toUpperCase())
+        funnel.name === filters.funnelType
       );
     }
-    
+  
     // Apply date range filters if specified
     if (filters.dateRange) {
       const now = new Date();
       let startDate;
-      
+    
       switch (filters.dateRange) {
         case 'today':
           startDate = new Date(now.setHours(0, 0, 0, 0));
@@ -110,36 +110,36 @@ function App() {
         default:
           startDate = null;
       }
-      
+    
       let endDate = null;
       if (filters.dateRange === 'custom' && filters.endDate) {
         endDate = new Date(filters.endDate);
         // Set to end of day
         endDate.setHours(23, 59, 59, 999);
       }
-      
+    
       // Apply date range filter to tasks
       if (startDate || endDate) {
         result = result.map(funnel => {
           const filteredTasks = funnel.tasks.filter(task => {
             if (!task.statusHistory || task.statusHistory.length === 0) return false;
-            
+          
             // Check the dates in status history
             return task.statusHistory.some(status => {
               const statusDate = new Date(status.updatedAt);
-              
+            
               if (startDate && statusDate < startDate) {
                 return false;
               }
-              
+            
               if (endDate && statusDate > endDate) {
                 return false;
               }
-              
+            
               return true;
             });
           });
-          
+        
           return {
             ...funnel,
             tasks: filteredTasks
@@ -147,12 +147,12 @@ function App() {
         });
       }
     }
-    
+  
     // Apply status filter to hide NEW tasks if hideNewStatus is true or if status filter is HIDE_NEW
     if (hideNewStatus || filters.status === 'HIDE_NEW') {
       result = result.map(funnel => {
         const filteredTasks = funnel.tasks.filter(task => task.currentStatus !== 'NEW');
-        
+      
         return {
           ...funnel,
           tasks: filteredTasks
@@ -163,14 +163,14 @@ function App() {
     else if (filters.status && filters.status !== 'HIDE_NEW') {
       result = result.map(funnel => {
         const filteredTasks = funnel.tasks.filter(task => task.currentStatus === filters.status);
-        
+      
         return {
           ...funnel,
           tasks: filteredTasks
         };
       });
     }
-    
+  
     // If we have any other active filters
     if (filters.taskId || filters.actorId) {
       // Map through each funnel
@@ -181,15 +181,15 @@ function App() {
           if (filters.taskId && !task.id.toLowerCase().includes(filters.taskId.toLowerCase())) {
             return false;
           }
-          
-          // Actor ID filter
+        
+          // Handled By filter (was Actor ID)
           if (filters.actorId && !task.handledBy.toString().toLowerCase().includes(filters.actorId.toLowerCase())) {
             return false;
           }
-          
+        
           return true;
         });
-        
+      
         // Return a new funnel object with filtered tasks
         return {
           ...funnel,
@@ -197,7 +197,7 @@ function App() {
         };
       });
     }
-    
+  
     // Update progress for all funnels based on filtered tasks
     result = result.map(funnel => {
       const completedTasks = funnel.tasks.filter(task => task.currentStatus === 'COMPLETED').length;
@@ -207,10 +207,10 @@ function App() {
         status: completedTasks === funnel.tasks.length && funnel.tasks.length > 0 ? 'completed' : 'in-progress'
       };
     });
-    
+  
     // Remove empty funnels (those with no tasks after filtering)
     result = result.filter(funnel => funnel.tasks.length > 0);
-    
+  
     setFilteredFunnelData(result);
   };
 
@@ -239,7 +239,7 @@ function App() {
       // If status is being changed, update hideNewStatus accordingly
       setHideNewStatus(value === 'HIDE_NEW');
     }
-    
+  
     setFilters(prev => ({
       ...prev,
       [name]: value
@@ -329,6 +329,7 @@ function App() {
         toggleFilters={toggleFilters}
         showFilters={showFilters}
       />
+      
 
       <main className="max-w-7xl mx-auto px-4 py-4">
         {applicationId && (
@@ -336,14 +337,14 @@ function App() {
             Application ID: {applicationId}
           </div>
         )}
-        
+      
         {applicationId && (
           <TabNavigation 
             activeTab={activeTab} 
             setActiveTab={setActiveTab} 
           />
         )}
-        
+      
         {showFilters && applicationId && activeTab === 'list' && (
           <FilterPanel 
             filters={filters}
@@ -351,9 +352,10 @@ function App() {
             clearFilters={clearFilters}
             hideNewStatus={hideNewStatus}
             setHideNewStatus={setHideNewStatus}
+            funnelData={funnelData} // Pass funnelData to FilterPanel
           />
         )}
-        
+      
         {renderTabContent()}
       </main>
     </div>

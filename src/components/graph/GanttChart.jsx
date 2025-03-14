@@ -1,28 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import TaskTimeline from './TaskTimeline.jsx';
-import FunnelSummary from './FunnelSummary';
-import { processDataForChart, funnelColors, statusColors } from './utils';
+import FunnelSummary from './FunnelSummary.jsx';
+import { processDataForChart, funnelColors, statusColors } from '../utils.js';
+
+const timeScales = [
+  { label: 'Per Hour', value: 60 * 60 * 1000 }, // milliseconds
+  { label: 'Per Minute', value: 60 * 1000 },
+  { label: 'Every 30 Minutes', value: 30 * 60 * 1000 },
+];
 
 const GanttChart = ({ data }) => {
   const [tasks, setTasks] = useState([]);
   const [funnels, setFunnels] = useState([]);
   const [timeRange, setTimeRange] = useState({ start: null, end: null });
-  
+  const [selectedScale, setSelectedScale] = useState(timeScales[0].value);
+
   useEffect(() => {
     if (!data || !data.funnelGroups) return;
-    
+
     // Process data for the chart
     const { processedTasks, uniqueFunnels, timeRange } = processDataForChart(data.funnelGroups);
     setTasks(processedTasks);
     setFunnels(uniqueFunnels);
     setTimeRange(timeRange);
   }, [data]);
-  
+
   // Get all unique statuses for the legend
   const allStatuses = [...new Set(tasks.flatMap(task => 
     task.statuses.map(status => status.status)
   ))];
-  
+
   // Group tasks by funnel
   const tasksByFunnel = {};
   tasks.forEach(task => {
@@ -31,10 +38,25 @@ const GanttChart = ({ data }) => {
     }
     tasksByFunnel[task.funnel].push(task);
   });
-  
+
   return (
     <div className="w-full bg-white rounded-lg shadow-lg p-6">
       <h2 className="text-xl font-bold mb-4">Task Workflow Timeline</h2>
+      
+      {/* Time Scale Selector */}
+      <div className="mb-4">
+        <label className="mr-2">Select Time Scale:</label>
+        <select 
+          value={selectedScale} 
+          onChange={(e) => setSelectedScale(Number(e.target.value))}
+        >
+          {timeScales.map(scale => (
+            <option key={scale.value} value={scale.value}>
+              {scale.label}
+            </option>
+          ))}
+        </select>
+      </div>
       
       {/* Status legend */}
       <div className="mb-4">
@@ -73,6 +95,7 @@ const GanttChart = ({ data }) => {
         funnels={funnels}
         tasksByFunnel={tasksByFunnel}
         timeRange={timeRange}
+        selectedScale={selectedScale}
       />
       
       {/* Funnel Summary Component */}
