@@ -39,5 +39,27 @@ export function getStatusDotColor(status) {
       return 'bg-gray-400';     
   }
 }
-
+export const formatDuration = (seconds) => {
+  if (seconds === undefined || seconds === null || seconds === 0) {
+    return '0 sec';
+  }
+  
+  if (seconds < 60) {
+    return `${seconds} sec`;
+  }
+  
+  if (seconds < 3600) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return remainingSeconds > 0 
+      ? `${minutes} min ${remainingSeconds} sec` 
+      : `${minutes} min`;
+  }
+  
+  const hours = Math.floor(seconds / 3600);
+  const remainingMinutes = Math.floor((seconds % 3600) / 60);
+  return remainingMinutes > 0 
+    ? `${hours} hr ${remainingMinutes} min` 
+    : `${hours} hr`;
+};
 

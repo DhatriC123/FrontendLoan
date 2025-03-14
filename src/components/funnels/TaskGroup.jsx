@@ -1,87 +1,91 @@
-// TaskGroup.jsx
-import React from 'react';
+import React, { useState } from 'react';
 import StatusTimeline from './StatusTimeline';
-import { getStatusColor } from '../../utils/formatters';
+import { getStatusColor, formatDuration, getStatusDotColor } from '../../utils/formatters';
 
-function TaskGroup({ task, isExpanded, onToggle }) {
-  const formattedCreatedAt = new Date(task.createdAt).toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true
-  });
 
-  // Format duration based on seconds
-  const formatDuration = (seconds) => {
-    if (seconds === undefined || seconds === null) return 'N/A';
+function TaskGroup({ tasks, isSendback }) {
+  // State to track which tasks have expanded timelines
+  const [expandedTasks, setExpandedTasks] = useState({});
+
+  // Toggle timeline visibility for a task
+  const toggleTaskTimeline = (taskId) => {
+    if (isSendback) return; // Don't toggle for sendback tasks
     
-    if (seconds === 0) return '0 sec';
-    
-    if (seconds < 60) {
-      return `${seconds} sec`;
-    } else if (seconds < 3600) {
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = seconds % 60;
-      return remainingSeconds > 0 
-        ? `${minutes} min ${remainingSeconds} sec` 
-        : `${minutes} min`;
-    } else {
-      const hours = Math.floor(seconds / 3600);
-      const minutes = Math.floor((seconds % 3600) / 60);
-      return minutes > 0 
-        ? `${hours} hr ${minutes} min` 
-        : `${hours} hr`;
-    }
+    setExpandedTasks(prev => ({
+      ...prev,
+      [taskId]: !prev[taskId]
+    }));
   };
 
+  // Sort tasks by createdAt date if available
+  const sortedTasks = [...tasks].sort((a, b) => {
+    // Check if both tasks have createdAt property
+    if (a?.createdAt && b?.createdAt) {
+      return new Date(a.createdAt) - new Date(b.createdAt);
+    }
+    // If only one has createdAt, prioritize the one without
+    if (a?.createdAt) return 1;
+    if (b?.createdAt) return -1;
+    // If neither has createdAt, maintain original order
+    return 0;
+  });
+
   return (
-    <div className="bg-white rounded-md overflow-hidden">
-      <div 
-        className="px-4 py-3 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors border border-gray-100 rounded-md"
-        onClick={onToggle}
-      >
-        {/* Left side - Task name, creation date and expand icon */}
-        <div className="flex flex-col">
-          <div className="flex items-center space-x-2">
-            <span className={`text-gray-500 transform transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`}>
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="9 18 15 12 9 6"></polyline>
-              </svg>
-            </span>
-            <h4 className="font-medium text-gray-800">{task.name || task.taskId}</h4>
-            <div className="flex items-center space-x-3 ml-2">
-              <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full">
-                Duration: {formatDuration(task.duration)}
-              </span>
-              <span className="text-xs px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full">
-                Sendbacks: {task.sendbacks !== undefined ? task.sendbacks : 'N/A'}
-              </span>
+    <div className="space-y-3">
+      {sortedTasks.map((task, index) => (
+        <div key={task?.id || index} className="bg-gray-50 p-3 rounded-md">
+          <div 
+            className={`flex flex-col sm:flex-row sm:justify-between ${!isSendback ? 'cursor-pointer' : ''}`}
+            onClick={() => toggleTaskTimeline(task?.id || index)}
+          >
+            <div className="mb-2 sm:mb-0">
+              <div className="font-medium">{task?.name || 'Unknown Task'}</div>
+              <div className="text-sm text-gray-500">ID: {task?.id || 'N/A'}</div>
+            </div>
+            <div className="flex flex-col sm:items-end">
+              <div className="text-sm">
+                <span className="font-medium">Status:</span>{' '}
+                <span className={getStatusColor(task?.currentStatus || 'UNKNOWN')}>
+                  {task?.currentStatus || 'UNKNOWN'}
+                </span>
+              </div>
+              <div className="text-sm text-gray-500">
+                <span className="font-medium">Handled by:</span> {task?.handledBy || 'N/A'}
+              </div>
+              {(task?.duration !== undefined || task?.sendbacks !== undefined) && (
+                <div className="text-sm text-gray-500">
+                  {task?.duration !== undefined && (
+                    <span className="mr-3">
+                      <span className="font-medium">Duration:</span> {formatDuration(task.duration)}
+                    </span>
+                  )}
+                  {task?.sendbacks !== undefined && (
+                    <span>
+                      <span className="font-medium">Sendbacks:</span> {task.sendbacks}
+                    </span>
+                  )}
+                </div>
+              )}
+              {!isSendback && (
+                <div className="text-xs text-blue-600 mt-1">
+                  {expandedTasks[task?.id || index] ? 'Hide Timeline' : 'Show Timeline'}
+                </div>
+              )}
             </div>
           </div>
-          <div className="mt-1 text-xs text-gray-500 ml-6">
-            Created: {formattedCreatedAt}
-          </div>
+          
+          {/* Status Timeline - only for non-sendback tasks */}
+          {!isSendback && expandedTasks[task?.id || index] && task?.statusHistory && task.statusHistory.length > 0 && (
+            <div className="mt-4 border-t border-gray-200 pt-3">
+              <StatusTimeline statusHistory={task.statusHistory} />
+            </div>
+          )}
         </div>
-      
-        {/* Right side - Status and handler */}
-        <div className="flex items-center space-x-3">
-          <span className="text-sm text-gray-600">Handled by: {task.handledBy}</span>
-          <span className={`px-2 py-0.5 rounded-full text-xs ${getStatusColor(task.currentStatus)}`}>
-            {task.currentStatus}
-          </span>
-        </div>
-      </div>
-    
-      {/* Status Timeline */}
-      {isExpanded && (
-        <div className="px-4 py-3 mt-2 bg-gray-50 rounded-md">
-          <StatusTimeline statusHistory={task.statusHistory} />
-        </div>
-      )}
+      ))}
     </div>
   );
 }
+
+
 
 export default TaskGroup;

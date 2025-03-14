@@ -1,6 +1,7 @@
 import React from 'react'
 
 const mocklogdata = {
+    "tasksGroupedByFunnel": {
     "SOURCING": {
         "funnel": "SOURCING",
         "funnelDuration": 0,
@@ -793,7 +794,300 @@ const mocklogdata = {
                 "visited": 0
             }
         ]
+    },
+    "sendbackTasks": {
+        "UNKNOWN_REQUEST": [
+            {
+                "taskId": "sendback",
+                "order": 110,
+                "handledBy": "john.doe@cars24.com",
+                "createdAt": "2025-03-10T12:48:00.000+00:00",
+                "statusHistory": [
+                    {
+                        "status": "NEW",
+                        "updatedAt": "2025-03-10T12:49:00.000+00:00"
+                    }
+                ],
+                "targetTaskId": null,
+                "duration": 0,
+                "sendbacks": 0,
+                "visited": 0
+            },
+            {
+                "taskId": "sendback",
+                "order": 110,
+                "handledBy": "john.doe@cars24.com",
+                "createdAt": "2025-03-10T12:50:00.000+00:00",
+                "statusHistory": [
+                    {
+                        "status": "TODO",
+                        "updatedAt": "2025-03-10T12:51:00.000+00:00"
+                    }
+                ],
+                "targetTaskId": null,
+                "duration": 0,
+                "sendbacks": 0,
+                "visited": 0
+            },
+            {
+                "taskId": "sendback",
+                "order": 110,
+                "handledBy": "john.doe@cars24.com",
+                "createdAt": "2025-03-10T12:52:00.000+00:00",
+                "statusHistory": [
+                    {
+                        "status": "IN_PROGRESS",
+                        "updatedAt": "2025-03-10T12:53:00.000+00:00"
+                    }
+                ],
+                "targetTaskId": null,
+                "duration": 0,
+                "sendbacks": 0,
+                "visited": 0
+            },
+            {
+                "taskId": "sendback",
+                "order": 110,
+                "handledBy": "john.doe@cars24.com",
+                "createdAt": "2025-03-10T12:54:00.000+00:00",
+                "statusHistory": [
+                    {
+                        "status": "COMPLETED",
+                        "updatedAt": "2025-03-10T12:55:00.000+00:00"
+                    }
+                ],
+                "targetTaskId": null,
+                "duration": 0,
+                "sendbacks": 0,
+                "visited": 0
+            },
+            {
+                "taskId": "sendback",
+                "order": 110,
+                "handledBy": "john.doe@cars24.com",
+                "createdAt": "2025-03-10T12:48:00.000+00:00",
+                "statusHistory": [
+                    {
+                        "status": "NEW",
+                        "updatedAt": "2025-03-10T12:49:00.000+00:00"
+                    }
+                ],
+                "targetTaskId": null,
+                "duration": 0,
+                "sendbacks": 0,
+                "visited": 0
+            }
+        ],
+        "b0ae387cc79ce5325025ef0580fe67d0506f5a865c88857dd709527a2b8144e5": [
+            {
+                "taskId": "sendback",
+                "order": 110,
+                "handledBy": "hemang.dixit@cars24.com",
+                "createdAt": "2025-02-27T16:38:20.895+00:00",
+                "statusHistory": [
+                    {
+                        "status": "TODO",
+                        "updatedAt": "2025-03-03T17:28:59.090+00:00"
+                    }
+                ],
+                "targetTaskId": "current_address_capture",
+                "duration": 0,
+                "sendbacks": 0,
+                "visited": 0
+            },
+            {
+                "taskId": "sendback",
+                "order": 110,
+                "handledBy": "hemang.dixit@cars24.com",
+                "createdAt": "2025-02-27T16:38:20.895+00:00",
+                "statusHistory": [
+                    {
+                        "status": "COMPLETED",
+                        "updatedAt": "2025-03-03T17:28:35.379+00:00"
+                    }
+                ],
+                "targetTaskId": "current_address_capture",
+                "duration": 0,
+                "sendbacks": 0,
+                "visited": 0
+            },
+            {
+                "taskId": "sendback",
+                "order": 110,
+                "handledBy": "hemang.dixit@cars24.com",
+                "createdAt": "2025-02-27T16:38:20.895+00:00",
+                "statusHistory": [
+                    {
+                        "status": "COMPLETED",
+                        "updatedAt": "2025-03-03T17:28:35.205+00:00"
+                    }
+                ],
+                "targetTaskId": "current_address_capture",
+                "duration": 0,
+                "sendbacks": 0,
+                "visited": 0
+            }
+        ]
+    },
+    "latestTaskState": {
+        "order": 601,
+        "handledBy": "john.doe@cars24.com",
+        "status": "COMPLETED",
+        "duration": 0,
+        "updatedAt": "2025-03-10T13:41:00.000+00:00",
+        "createdAt": "2025-03-10T13:40:00.000+00:00",
+        "taskId": "rto_completion",
+        "sendbacks": 0,
+        "visited": 0
     }
+},
+"sendbackTasks": {
+    "UNKNOWN_REQUEST": [
+        {
+            "taskId": "sendback",
+            "order": 110,
+            "handledBy": "john.doe@cars24.com",
+            "createdAt": "2025-03-10T12:48:00.000+00:00",
+            "statusHistory": [
+                {
+                    "status": "NEW",
+                    "updatedAt": "2025-03-10T12:49:00.000+00:00"
+                }
+            ],
+            "targetTaskId": null,
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
+        },
+        {
+            "taskId": "sendback",
+            "order": 110,
+            "handledBy": "john.doe@cars24.com",
+            "createdAt": "2025-03-10T12:50:00.000+00:00",
+            "statusHistory": [
+                {
+                    "status": "TODO",
+                    "updatedAt": "2025-03-10T12:51:00.000+00:00"
+                }
+            ],
+            "targetTaskId": null,
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
+        },
+        {
+            "taskId": "sendback",
+            "order": 110,
+            "handledBy": "john.doe@cars24.com",
+            "createdAt": "2025-03-10T12:52:00.000+00:00",
+            "statusHistory": [
+                {
+                    "status": "IN_PROGRESS",
+                    "updatedAt": "2025-03-10T12:53:00.000+00:00"
+                }
+            ],
+            "targetTaskId": null,
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
+        },
+        {
+            "taskId": "sendback",
+            "order": 110,
+            "handledBy": "john.doe@cars24.com",
+            "createdAt": "2025-03-10T12:54:00.000+00:00",
+            "statusHistory": [
+                {
+                    "status": "COMPLETED",
+                    "updatedAt": "2025-03-10T12:55:00.000+00:00"
+                }
+            ],
+            "targetTaskId": null,
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
+        },
+        {
+            "taskId": "sendback",
+            "order": 110,
+            "handledBy": "john.doe@cars24.com",
+            "createdAt": "2025-03-10T12:48:00.000+00:00",
+            "statusHistory": [
+                {
+                    "status": "NEW",
+                    "updatedAt": "2025-03-10T12:49:00.000+00:00"
+                }
+            ],
+            "targetTaskId": null,
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
+        }
+    ],
+    "b0ae387cc79ce5325025ef0580fe67d0506f5a865c88857dd709527a2b8144e5": [
+        {
+            "taskId": "sendback",
+            "order": 110,
+            "handledBy": "hemang.dixit@cars24.com",
+            "createdAt": "2025-02-27T16:38:20.895+00:00",
+            "statusHistory": [
+                {
+                    "status": "TODO",
+                    "updatedAt": "2025-03-03T17:28:59.090+00:00"
+                }
+            ],
+            "targetTaskId": "current_address_capture",
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
+        },
+        {
+            "taskId": "sendback",
+            "order": 110,
+            "handledBy": "hemang.dixit@cars24.com",
+            "createdAt": "2025-02-27T16:38:20.895+00:00",
+            "statusHistory": [
+                {
+                    "status": "COMPLETED",
+                    "updatedAt": "2025-03-03T17:28:35.379+00:00"
+                }
+            ],
+            "targetTaskId": "current_address_capture",
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
+        },
+        {
+            "taskId": "sendback",
+            "order": 110,
+            "handledBy": "hemang.dixit@cars24.com",
+            "createdAt": "2025-02-27T16:38:20.895+00:00",
+            "statusHistory": [
+                {
+                    "status": "COMPLETED",
+                    "updatedAt": "2025-03-03T17:28:35.205+00:00"
+                }
+            ],
+            "targetTaskId": "current_address_capture",
+            "duration": 0,
+            "sendbacks": 0,
+            "visited": 0
+        }
+    ]
+},
+"latestTaskState": {
+    "order": 601,
+    "handledBy": "john.doe@cars24.com",
+    "status": "COMPLETED",
+    "duration": 0,
+    "updatedAt": "2025-03-10T13:41:00.000+00:00",
+    "createdAt": "2025-03-10T13:40:00.000+00:00",
+    "taskId": "rto_completion",
+    "sendbacks": 0,
+    "visited": 0
 }
+
+}
+
 
 export default mocklogdata;

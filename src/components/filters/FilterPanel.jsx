@@ -118,34 +118,6 @@ function FilterPanel({
             <option value="custom">Custom Range</option>
           </select>
         </div>
-      
-        {/* Sort Options */}
-        <div>
-          <label htmlFor="sortBy" className="block text-sm font-medium text-gray-700">
-            Sort By
-          </label>
-          <div className="mt-1 flex rounded-md shadow-sm">
-            <select
-              id="sortBy"
-              value={filters.sortBy}
-              onChange={(e) => handleFilterChange('sortBy', e.target.value)}
-              className="block w-full rounded-l-md border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            >
-              <option value="updatedAt">Updated At</option>
-              <option value="taskId">Task ID</option>
-              <option value="status">Status</option>
-              <option value="actorId">Handled By</option>
-            </select>
-            <select
-              value={filters.sortOrder}
-              onChange={(e) => handleFilterChange('sortOrder', e.target.value)}
-              className="block rounded-r-md border-l-0 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-            >
-              <option value="asc">Asc</option>
-              <option value="desc">Desc</option>
-            </select>
-          </div>
-        </div>
       </div>
     
       {/* Custom Date Range (conditionally rendered) */}

@@ -7,6 +7,7 @@ import TabNavigation from './components/common/TabNavigation';
 import FunnelView from './components/funnels/FunnelView';
 import { transformApiData } from './utils/apiTransformers';
 import mocklogdata from './mockData/mocklogdata';
+//import AnalyticsView from './components/AnalyticsView';
 
 function App() {
   const [expandedFunnels, setExpandedFunnels] = useState({});
