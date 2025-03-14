@@ -1,6 +1,8 @@
 import React from 'react';
 import FunnelCard from './FunnelCard';
-import { formatDuration } from '../../utils/formatters'; // Make sure this import exists
+import { formatDuration,getStatusColor } from '../../utils/formatters';
+
+ // Make sure this import exists
 
 function FunnelView({ funnelData, expandedFunnels, toggleFunnel }) {
   // Separate the data into three categories
