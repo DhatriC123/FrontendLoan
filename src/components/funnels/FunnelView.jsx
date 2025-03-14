@@ -103,23 +103,7 @@ function FunnelView({ funnelData, expandedFunnels, toggleFunnel }) {
   );
 }
 
-// Helper function to get status color
-function getStatusColor(status) {
-  switch (status) {
-    case 'COMPLETED':
-      return 'text-green-600';
-    case 'IN_PROGRESS':
-      return 'text-blue-600';
-    case 'FAILED':
-      return 'text-red-600';
-    case 'PENDING':
-    case 'TODO':
-      return 'text-yellow-600';
-    case 'NEW':
-      return 'text-purple-600';
-    default:
-      return 'text-gray-600';
-  }
-}
+
+
 
 export default FunnelView;
