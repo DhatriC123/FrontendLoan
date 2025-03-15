@@ -20,6 +20,7 @@ function App() {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('list'); 
   const [hideNewStatus, setHideNewStatus] = useState(true); 
+  const [pollingInterval, setPollingInterval] = useState(null);
 
   const [filters, setFilters] = useState({
     taskId: '',
@@ -34,6 +35,34 @@ function App() {
     sortOrder: 'asc' 
   });
   const [showFilters, setShowFilters] = useState(false);
+  const stopPolling = () => {
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
+      setPollingInterval(null);
+    }
+  };
+  
+  const startPolling = () => {
+    stopPolling(); 
+    fetchFunnelData(); 
+    console.log("Polling started at:", new Date().toLocaleTimeString());
+    const interval = setInterval(() => {
+      console.log("Polling triggered at:", new Date().toLocaleTimeString());
+      fetchFunnelData();
+    }, 10000); // Poll every 10 seconds
+  
+    setPollingInterval(interval);
+  };
+
+  useEffect(() => {
+    if (applicationId) {
+      startPolling();  
+    } else {
+      stopPolling(); 
+    }
+
+    return () => stopPolling(); 
+  }, [applicationId]);
 
   useEffect(() => {
     if (applicationId) {

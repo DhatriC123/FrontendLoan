@@ -8,8 +8,23 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
   const tooltipRef = useRef(null);
   const timelineRef = useRef(null);
 
+  // Debounce function for position updates
+  const debounce = (fn, delay) => {
+    let timer;
+    return (...args) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => fn(...args), delay);
+    };
+  };
+
   useEffect(() => {
     if (!tooltipPosition || !hoveredTask || isPinned) return;
+
+    // Set initial position immediately to prevent jitter
+    setAdjustedPosition({
+      x: tooltipPosition.x - 150, // Approximate half width
+      y: tooltipPosition.y + 20
+    });
 
     const updatePosition = () => {
       if (tooltipRef.current) {
@@ -27,7 +42,7 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
         if (newX + tooltipRect.width > viewportWidth - 10) {
           newX = viewportWidth - tooltipRect.width - 10;
         }
-    
+      
         if (newY + tooltipRect.height > viewportHeight - 10) {
           // If tooltip would go below viewport, position it above the target
           newY = Math.max(10, tooltipPosition.y - tooltipRect.height - 10);
@@ -37,21 +52,16 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
       }
     };
 
-    // Increase delay to ensure DOM is ready
-    setTimeout(updatePosition, 100);
-
+    // Use requestAnimationFrame for smoother updates
+    const animationId = requestAnimationFrame(updatePosition);
+  
     // Debounce window resize handler
-    let resizeTimer;
-    const handleResize = () => {
-      clearTimeout(resizeTimer);
-      resizeTimer = setTimeout(updatePosition, 100);
-    };
-
-    window.addEventListener('resize', handleResize);
+    const debouncedUpdatePosition = debounce(updatePosition, 50);
+    window.addEventListener('resize', debouncedUpdatePosition);
 
     return () => {
-      window.removeEventListener('resize', handleResize);
-      clearTimeout(resizeTimer);
+      window.removeEventListener('resize', debouncedUpdatePosition);
+      cancelAnimationFrame(animationId);
     };
   }, [tooltipPosition, hoveredTask, isPinned]);
 
@@ -89,7 +99,7 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
   }));
 
   // Calculate the required width for the timeline based on number of statuses
-  const minStatusSpacing = 80; // Minimum pixels between statuses
+  const minStatusSpacing = 120; // Increased from 80 to provide more space
   const timelineWidth = formattedStatuses.length * minStatusSpacing;
 
   return (
@@ -103,6 +113,8 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
         maxHeight: '80vh',
         overflow: 'auto',
         opacity: 1,
+        transform: 'translateZ(0)', // Force GPU acceleration
+        willChange: 'transform', // Hint for browser optimization
         transition: 'opacity 0.15s ease-in-out',
       }}
       onClick={handleTooltipClick}
@@ -145,7 +157,7 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
       {/* Status Timeline - Fixed width approach */}
       <div className="mt-4">
         <p className="font-semibold mb-2">Status Timeline:</p>
-    
+      
         <div 
           className="relative" 
           ref={timelineRef}
@@ -157,16 +169,16 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
         >
           {/* Timeline bar */}
           <div className="absolute left-0 right-0 h-0.5 bg-gray-300" style={{ top: '20px' }}></div>
-      
-          {/* Timeline markers */}
-          <div className="absolute left-0 text-xs text-gray-500">{format(formattedStatuses[0].time, 'HH:mm:ss')}</div>
-          <div className="absolute right-0 text-xs text-gray-500">{format(formattedStatuses[formattedStatuses.length - 1].time, 'HH:mm:ss')}</div>
-      
+          
+          {/* Remove the timeline markers that were causing duplicate timestamps */}
+          {/* <div className="absolute left-0 text-xs text-gray-500">{format(formattedStatuses[0].time, 'HH:mm:ss')}</div>
+          <div className="absolute right-0 text-xs text-gray-500">{format(formattedStatuses[formattedStatuses.length - 1].time, 'HH:mm:ss')}</div> */}
+        
           {/* Status points with even spacing */}
           {formattedStatuses.map((status, idx) => {
             // Calculate position based on even spacing
             const position = (idx / (formattedStatuses.length - 1)) * 100;
-        
+          
             return (
               <div key={idx} className="absolute pointer-events-none" style={{ left: `${position}%`, top: 0 }}>
                 {/* Status dot */}
@@ -181,7 +193,7 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
                     title={`${status.status} at ${status.formattedTime}`}
                   ></div>
                 </div>
-            
+              
                 {/* Status label */}
                 <div
                   className="absolute text-xs font-medium whitespace-nowrap"
@@ -194,34 +206,29 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
                 >
                   {status.status}
                 </div>
-            
-                {/* Time label - show only for first, last and some middle points if many */}
-                {(formattedStatuses.length <= 5 || 
-                  idx === 0 || 
-                  idx === formattedStatuses.length - 1 || 
-                  idx % Math.ceil(formattedStatuses.length / 5) === 0) && (
-                  <div
-                    className="absolute text-xs text-gray-500"
-                    style={{
-                      top: '0px',
-                      left: '-25px',
-                      width: '50px',
-                      textAlign: 'center'
-                    }}
-                  >
-                    {status.formattedTime}
-                  </div>
-                )}
+              
+                {/* Time label - single timestamp from API */}
+                <div
+                  className="absolute text-xs text-gray-500"
+                  style={{
+                    top: '0px',
+                    left: '-30px',
+                    width: '60px',
+                    textAlign: 'center'
+                  }}
+                >
+                  {format(status.time, 'HH:mm:ss')}
+                </div>
               </div>
             );
           })}
-      
+        
           {/* Connector lines between points */}
           {formattedStatuses.slice(0, -1).map((status, idx) => {
             const nextStatus = formattedStatuses[idx + 1];
             const startPosition = (idx / (formattedStatuses.length - 1)) * 100;
             const endPosition = ((idx + 1) / (formattedStatuses.length - 1)) * 100;
-        
+          
             return (
               <div
                 key={`connector-${idx}`}

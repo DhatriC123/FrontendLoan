@@ -135,7 +135,8 @@ const TaskTimeline = ({ funnels, tasksByFunnel, timeRange }) => {
 
             return (
               <div key={funnelIdx} className="relative">
-                <div className="h-10 border-b border-gray-200"></div>
+                {/* REMOVED THIS DIV - it was causing the offset */}
+                {/* <div className="h-10 border-b border-gray-200"></div> */}
 
                 {funnelTasks.map((task, idx) => {
                   // Sort segments by start time for connector lines
@@ -165,7 +166,8 @@ const TaskTimeline = ({ funnels, tasksByFunnel, timeRange }) => {
                               style={{
                                 left: `calc(${currentLeft}% + ${currentWidth}%)`,
                                 width: `calc(${nextLeft}% - ${currentLeft}% - ${currentWidth}%)`,
-                                top: '5px', // Align with the middle of the task bar
+                                top: '50%',
+                                transform: 'translateY(-50%)',
                                 zIndex: 5
                               }}
                             />
@@ -185,7 +187,8 @@ const TaskTimeline = ({ funnels, tasksByFunnel, timeRange }) => {
                                 left: position.left,
                                 width: position.width,
                                 zIndex: 10,
-                                top: '4px', // Align with the connector lines
+                                top: '50%',
+                                transform: 'translateY(-50%)',
                               }}
                               data-task-id={`${funnel}-${task.id}-${segmentIdx}`}
                               onClick={(e) => handleTaskClick(e, task, segment)}
