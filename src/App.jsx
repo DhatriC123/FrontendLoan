@@ -4,7 +4,7 @@ import Header from './components/common/Header';
 import FilterPanel from './components/filters/FilterPanel';
 import Dashboard from './Dashboard';
 import TabNavigation from './components/common/TabNavigation';
-import FunnelView from './components/ListView/FunnelView';
+import FunnelView from './components/funnels/FunnelView';
 import { transformApiData } from './utils/apiTransformers';
 import mocklogdata from './mockData/mocklogdata';
 import { fetchFunnelData } from './services/api/applicationListApi';
