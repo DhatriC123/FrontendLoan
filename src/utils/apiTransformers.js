@@ -105,7 +105,8 @@ const formatTaskName = (taskId) => {
   
   // Convert snake_case to Title Case
   return taskId
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
+  .split('_')
+  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+  .join(' ')
+  .toUpperCase();
 };
