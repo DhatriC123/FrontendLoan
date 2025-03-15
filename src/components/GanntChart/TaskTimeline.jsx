@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { format } from 'date-fns';
-import { funnelColors, statusColors } from '../utils';
+import { funnelColors, statusColors } from '../../utils/Ganntutils';
 import TaskTooltip from './TaskTooltip';
 
 const TaskTimeline = ({ funnels, tasksByFunnel, timeRange }) => {

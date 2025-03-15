@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import TaskTimeline from './TaskTimeline.jsx';
 import FunnelSummary from './FunnelSummary.jsx';
-import { processDataForChart, funnelColors, statusColors } from '../utils.js';
+import { processDataForChart, funnelColors, statusColors } from '../../utils/Ganntutils.js';
 
 const timeScales = [
   { label: 'Per Hour', value: 60 * 60 * 1000 }, // milliseconds

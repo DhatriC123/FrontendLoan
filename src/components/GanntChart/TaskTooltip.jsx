@@ -1,6 +1,6 @@
 import React from 'react';
 import { format } from 'date-fns';
-import { statusColors } from '../utils';
+import { statusColors } from '../../utils/Ganntutils';
 
 const TaskTooltip = ({ hoveredTask, tooltipPosition }) => {
   if (!hoveredTask) return null;

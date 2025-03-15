@@ -1,6 +1,6 @@
 import React, { useState ,useEffect} from 'react';
-import GanttChart from './components/graph/GanttChart';
-import { fetchTasksByApplicationId } from './services/api';
+import GanttChart from './components/GanntChart/GanttChart';
+import { fetchTasksByApplicationId } from './services/api/Ganntapi';
 import mockTaskData from './mockData/mockGanttChartData';
 
 function Dashboard() {
