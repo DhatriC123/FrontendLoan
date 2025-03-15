@@ -6,9 +6,10 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
   const [isPinned, setIsPinned] = useState(false);
   const [adjustedPosition, setAdjustedPosition] = useState({ x: 0, y: 0 });
   const tooltipRef = useRef(null);
+  const timelineRef = useRef(null);
 
   useEffect(() => {
-    if (!tooltipPosition || !hoveredTask) return;
+    if (!tooltipPosition || !hoveredTask || isPinned) return;
 
     const updatePosition = () => {
       if (tooltipRef.current) {
@@ -16,14 +17,19 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
 
-        let newX = tooltipPosition.x + 10;
-        let newY = tooltipPosition.y + 10;
+        // Center the tooltip horizontally on the position
+        let newX = tooltipPosition.x - (tooltipRect.width / 2);
+        // Position the tooltip below the target
+        let newY = tooltipPosition.y + 20;
 
-        if (newX + tooltipRect.width > viewportWidth) {
-          newX = Math.max(10, tooltipPosition.x - tooltipRect.width - 10);
+        // Ensure tooltip stays within viewport bounds
+        if (newX < 10) newX = 10;
+        if (newX + tooltipRect.width > viewportWidth - 10) {
+          newX = viewportWidth - tooltipRect.width - 10;
         }
-
-        if (newY + tooltipRect.height > viewportHeight) {
+    
+        if (newY + tooltipRect.height > viewportHeight - 10) {
+          // If tooltip would go below viewport, position it above the target
           newY = Math.max(10, tooltipPosition.y - tooltipRect.height - 10);
         }
 
@@ -31,18 +37,28 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
       }
     };
 
-    updatePosition();
-    window.addEventListener('resize', updatePosition);
+    // Increase delay to ensure DOM is ready
+    setTimeout(updatePosition, 100);
+
+    // Debounce window resize handler
+    let resizeTimer;
+    const handleResize = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(updatePosition, 100);
+    };
+
+    window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('resize', updatePosition);
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimer);
     };
-  }, [tooltipPosition, hoveredTask]);
+  }, [tooltipPosition, hoveredTask, isPinned]);
 
   useEffect(() => {
     const handleOutsideClick = (e) => {
       if (tooltipRef.current && !tooltipRef.current.contains(e.target) && isPinned) {
-        onClose(); // Call the onClose function passed from the parent
+        onClose();
       }
     };
 
@@ -54,12 +70,12 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
 
   const handleTooltipClick = (e) => {
     e.stopPropagation();
-    setIsPinned(true); // Pin the tooltip when clicked
+    setIsPinned(true);
   };
 
   const handleCloseClick = (e) => {
     e.stopPropagation();
-    onClose(); // Call the onClose function passed from the parent
+    onClose();
   };
 
   if (!hoveredTask) return null;
@@ -72,26 +88,32 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
     formattedTime: format(status.time, 'HH:mm:ss'),
   }));
 
+  // Calculate the required width for the timeline based on number of statuses
+  const minStatusSpacing = 80; // Minimum pixels between statuses
+  const timelineWidth = formattedStatuses.length * minStatusSpacing;
+
   return (
     <div
       ref={tooltipRef}
-      className={`fixed z-50 bg-white p-4 rounded-lg shadow-xl border border-gray-200 text-sm ${isPinned ? 'cursor-default' : 'cursor-pointer'}`}
+      className="fixed z-50 bg-white p-4 rounded-lg shadow-xl border border-gray-200 text-sm task-tooltip"
       style={{
         left: `${adjustedPosition.x}px`,
         top: `${adjustedPosition.y}px`,
-        maxWidth: '80vw',
-        minWidth: '300px',
+        maxWidth: '400px',
+        maxHeight: '80vh',
         overflow: 'auto',
+        opacity: 1,
+        transition: 'opacity 0.15s ease-in-out',
       }}
-      onClick={handleTooltipClick} // Pin on click
+      onClick={handleTooltipClick}
     >
       <div className="flex justify-between items-center mb-2">
         <h4 className="font-bold text-lg">{hoveredTask.id}</h4>
         <button
           className="text-gray-500 hover:text-gray-700 focus:outline-none"
-          onClick={handleCloseClick} // Unpin on close button click
+          onClick={handleCloseClick}
         >
-          &times; {/* Close icon */}
+          &times;
         </button>
       </div>
 
@@ -120,77 +142,103 @@ const TaskTooltip = ({ hoveredTask, tooltipPosition, onClose }) => {
         </div>
       </div>
 
-      {/* Status Timeline */}
+      {/* Status Timeline - Fixed width approach */}
       <div className="mt-4">
         <p className="font-semibold mb-2">Status Timeline:</p>
-
-        <div className="relative mt-2 mb-2 h-28">
+    
+        <div 
+          className="relative" 
+          ref={timelineRef}
+          style={{ 
+            width: `${Math.max(350, timelineWidth)}px`, 
+            height: '90px', 
+            overflow: 'visible' 
+          }}
+        >
+          {/* Timeline bar */}
           <div className="absolute left-0 right-0 h-0.5 bg-gray-300" style={{ top: '20px' }}></div>
-
+      
+          {/* Timeline markers */}
+          <div className="absolute left-0 text-xs text-gray-500">{format(formattedStatuses[0].time, 'HH:mm:ss')}</div>
+          <div className="absolute right-0 text-xs text-gray-500">{format(formattedStatuses[formattedStatuses.length - 1].time, 'HH:mm:ss')}</div>
+      
+          {/* Status points with even spacing */}
           {formattedStatuses.map((status, idx) => {
-            const denominator = formattedStatuses[formattedStatuses.length - 1].time - formattedStatuses[0].time;
-            const position = denominator === 0 ? 50 : ((status.time - formattedStatuses[0].time) / denominator * 100);
-            const nextStatus = formattedStatuses[idx + 1];
-
+            // Calculate position based on even spacing
+            const position = (idx / (formattedStatuses.length - 1)) * 100;
+        
             return (
-              <React.Fragment key={idx}>
-                <div
-                  className="absolute"
-                  style={{
-                    left: `${position}%`,
-                    top: '20px',
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                >
+              <div key={idx} className="absolute pointer-events-none" style={{ left: `${position}%`, top: 0 }}>
+                {/* Status dot */}
+                <div className="relative">
                   <div
-                    className="w-5 h-5 rounded-full border-2 border-white shadow-md"
-                    style={{ backgroundColor: status.color }}
+                    className="absolute w-5 h-5 rounded-full border-2 border-white shadow-md"
+                    style={{ 
+                      backgroundColor: status.color,
+                      top: '20px',
+                      left: '-10px'
+                    }}
                     title={`${status.status} at ${status.formattedTime}`}
                   ></div>
                 </div>
-
+            
+                {/* Status label */}
                 <div
-                  className="absolute text-xs font-medium text-center whitespace-nowrap overflow-hidden text-ellipsis"
+                  className="absolute text-xs font-medium whitespace-nowrap"
                   style={{
-                    left: `${position}%`,
-                    top: '0px',
-                    transform: 'translateX(-50%)',
-                    width: '60px',
+                    top: '45px',
+                    left: '-25px',
+                    width: '50px',
+                    textAlign: 'center'
                   }}
                 >
                   {status.status}
                 </div>
-
-                <div
-                  className="absolute text-xs text-gray-500 text-center"
-                  style={{
-                    left: `${position}%`,
-                    top: '35px',
-                    transform: 'translateX(-50%)',
-                    width: '60px',
-                  }}
-                >
-                  {status.formattedTime}
-                </div>
-
-                {nextStatus && denominator !== 0 && (
+            
+                {/* Time label - show only for first, last and some middle points if many */}
+                {(formattedStatuses.length <= 5 || 
+                  idx === 0 || 
+                  idx === formattedStatuses.length - 1 || 
+                  idx % Math.ceil(formattedStatuses.length / 5) === 0) && (
                   <div
-                    className="absolute h-0.5 bg-gray-400"
+                    className="absolute text-xs text-gray-500"
                     style={{
-                      left: `${position}%`,
-                      top: '20px',
-                      width: `${((nextStatus.time - status.time) / denominator * 100)}%`,
+                      top: '0px',
+                      left: '-25px',
+                      width: '50px',
+                      textAlign: 'center'
                     }}
-                  ></div>
+                  >
+                    {status.formattedTime}
+                  </div>
                 )}
-              </React.Fragment>
+              </div>
+            );
+          })}
+      
+          {/* Connector lines between points */}
+          {formattedStatuses.slice(0, -1).map((status, idx) => {
+            const nextStatus = formattedStatuses[idx + 1];
+            const startPosition = (idx / (formattedStatuses.length - 1)) * 100;
+            const endPosition = ((idx + 1) / (formattedStatuses.length - 1)) * 100;
+        
+            return (
+              <div
+                key={`connector-${idx}`}
+                className="absolute h-0.5 bg-gray-400 pointer-events-none"
+                style={{
+                  left: `${startPosition}%`,
+                  top: '20px',
+                  width: `${endPosition - startPosition}%`,
+                }}
+              ></div>
             );
           })}
         </div>
       </div>
 
-      <div className="mt-4 text-xs text-gray-500 text-center italic">
-        {isPinned ? 'Click to unpin this tooltip' : 'Click to pin this tooltip'}
+      <div className="mt-2 text-xs text-gray-500 text-center italic">
+        {isPinned ? 'Click outside to close this tooltip' : 'Click to pin this tooltip'}
       </div>
     </div>
   );

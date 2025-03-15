@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
 import { funnelColors, statusColors } from '../../utils/Ganntutils';
 import TaskTooltip from './TaskTooltip';
@@ -137,47 +137,77 @@ const TaskTimeline = ({ funnels, tasksByFunnel, timeRange }) => {
               <div key={funnelIdx} className="relative">
                 <div className="h-10 border-b border-gray-200"></div>
 
-                {funnelTasks.map((task, idx) => (
-                  <div
-                    key={idx}
-                    className="relative border-b border-gray-100"
-                    id={`task-row-${funnel}-${idx}`}
-                  >
-                    <div className="h-10 relative">
-                      {task.segments.map((segment, segmentIdx) => {
-                        const position = getSegmentPosition(segment, timeRange);
-                        const statusColor = statusColors[segment.status] || '#6B7280';
-
-                        return (
-                          <div
-                            key={segmentIdx}
-                            className="absolute task-segment"
-                            style={{
-                              left: position.left,
-                              width: position.width,
-                              zIndex: 10,
-                              top: '-20px',
-                            }}
-                            data-task-id={`${funnel}-${task.id}-${segmentIdx}`}
-                            onClick={(e) => handleTaskClick(e, task, segment)}
-                            onMouseEnter={(e) => handleTaskMouseEnter(e, task, segment)}
-                            onMouseLeave={handleTaskMouseLeave}
-                          >
+                {funnelTasks.map((task, idx) => {
+                  // Sort segments by start time for connector lines
+                  const sortedSegments = [...task.segments].sort((a, b) => a.startTime - b.startTime);
+                  
+                  return (
+                    <div
+                      key={idx}
+                      className="relative border-b border-gray-100"
+                      id={`task-row-${funnel}-${idx}`}
+                    >
+                      <div className="h-10 relative">
+                        {/* Connector lines */}
+                        {sortedSegments.length > 1 && sortedSegments.slice(0, -1).map((segment, segIdx) => {
+                          const nextSegment = sortedSegments[segIdx + 1];
+                          const currentPos = getSegmentPosition(segment, timeRange);
+                          const nextPos = getSegmentPosition(nextSegment, timeRange);
+                          
+                          const currentLeft = parseFloat(currentPos.left);
+                          const currentWidth = parseFloat(currentPos.width);
+                          const nextLeft = parseFloat(nextPos.left);
+                          
+                          return (
                             <div
-                              className="h-2 rounded"
-                              style={{ backgroundColor: funnelColor }}
-                            ></div>
+                              key={`connector-${task.id}-${segIdx}`}
+                              className="absolute border-t-2 border-dashed border-gray-400"
+                              style={{
+                                left: `calc(${currentLeft}% + ${currentWidth}%)`,
+                                width: `calc(${nextLeft}% - ${currentLeft}% - ${currentWidth}%)`,
+                                top: '5px', // Align with the middle of the task bar
+                                zIndex: 5
+                              }}
+                            />
+                          );
+                        })}
+                        
+                        {/* Task segments */}
+                        {task.segments.map((segment, segmentIdx) => {
+                          const position = getSegmentPosition(segment, timeRange);
+                          const statusColor = statusColors[segment.status] || '#6B7280';
 
+                          return (
                             <div
-                              className="absolute right-0 w-3 h-3 rounded-full border-2 border-white shadow-sm transform translate-x-1.5 top-1/2 -translate-y-1/2"
-                              style={{ backgroundColor: statusColor }}
-                            ></div>
-                          </div>
-                        );
-                      })}
+                              key={segmentIdx}
+                              className="absolute task-segment"
+                              style={{
+                                left: position.left,
+                                width: position.width,
+                                zIndex: 10,
+                                top: '4px', // Align with the connector lines
+                              }}
+                              data-task-id={`${funnel}-${task.id}-${segmentIdx}`}
+                              onClick={(e) => handleTaskClick(e, task, segment)}
+                              onMouseEnter={(e) => handleTaskMouseEnter(e, task, segment)}
+                              onMouseLeave={handleTaskMouseLeave}
+                            >
+                              <div
+                                className="h-2 rounded"
+                                style={{ backgroundColor: funnelColor }}
+                              ></div>
+
+                              <div
+                                className="absolute right-0 w-3 h-3 rounded-full border-2 border-white shadow-sm transform translate-x-1.5 top-1/2 -translate-y-1/2"
+                                style={{ backgroundColor: statusColor }}
+                              ></div>
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             );
           })}

@@ -7,7 +7,7 @@ import TabNavigation from './components/common/TabNavigation';
 import FunnelView from './components/funnels/FunnelView';
 import { transformApiData } from './utils/apiTransformers';
 import mocklogdata from './mockData/mocklogdata';
-import { fetchFunnelData } from './services/api/applicationListApi';
+import { fetchFunnelData } from './services/ApplicationListApi';
 //import AnalyticsView from './components/AnalyticsView';
 
 function App() {
